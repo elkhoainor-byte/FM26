@@ -38,7 +38,7 @@
   }
   .logo { font-weight: 800; font-size: 1.4rem; color: var(--accent); letter-spacing: -0.5px; }
   .logo span { color: var(--text); font-weight: 400; }
-  .header-info { display: flex; gap: 20px; font-size: 0.9rem; color: var(--muted); }
+  .header-info { display: flex; gap: 20px; font-size: 0.9rem; color: var(--muted); flex-wrap: wrap; }
   .header-info strong { color: var(--accent); }
   nav {
     display: flex;
@@ -203,7 +203,6 @@
   .bar span { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
   .news-item { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
   .news-item .date { color: var(--muted); font-size: 0.75rem; }
-  .transfer-list tr { cursor: pointer; }
   .modal-bg {
     position: fixed; inset: 0; background: rgba(0,0,0,0.7);
     display: none; align-items: center; justify-content: center; z-index: 200;
@@ -231,17 +230,69 @@
   }
   .injury { color: var(--loss); font-size: 0.75rem; }
   footer { text-align: center; padding: 20px; color: var(--muted); font-size: 0.8rem; }
+
+  /* START SCREEN */
+  #start-screen {
+    position: fixed; inset: 0; background: var(--bg); z-index: 300;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 20px; overflow-y: auto;
+  }
+  #start-screen.hidden { display: none; }
+  .start-logo { font-size: 2.8rem; font-weight: 800; color: var(--accent); margin-bottom: 8px; }
+  .start-logo span { color: var(--text); font-weight: 400; }
+  .start-sub { color: var(--muted); margin-bottom: 32px; font-size: 1.05rem; }
+  .club-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    max-width: 980px;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+  .club-card {
+    background: var(--panel);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .club-card:hover, .club-card.selected {
+    border-color: var(--accent);
+    background: rgba(0,212,170,0.08);
+  }
+  .club-card .cname { font-weight: 700; font-size: 1rem; }
+  .club-card .cmanager { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
+  .club-card .cstats { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+  .club-card .cstats strong { color: var(--accent); }
+  #game-ui { display: none; }
+  #game-ui.visible { display: block; }
 </style>
 </head>
 <body>
+
+<!-- ========== PANTALLA DE INICIO ========== -->
+<div id="start-screen">
+  <div class="start-logo">FM<span>26 Web</span></div>
+  <div class="start-sub">Simulador de Football Manager · Temporada 2025/26</div>
+  <h2 style="margin-bottom:16px;">Elige tu club</h2>
+  <div class="club-grid" id="club-select-grid"></div>
+  <button class="btn" id="btn-start-game" disabled style="font-size:1.05rem;padding:12px 28px;">Comenzar temporada</button>
+</div>
+
+<!-- ========== UI DEL JUEGO ========== -->
+<div id="game-ui">
 <header>
   <div class="logo">FM<span>26 Web</span></div>
   <div class="header-info">
     <div>Club: <strong id="hdr-club">—</strong></div>
+    <div>Entrenador: <strong id="hdr-manager">—</strong></div>
     <div>Temporada: <strong id="hdr-season">2025/26</strong></div>
     <div>Jornada: <strong id="hdr-matchday">1</strong></div>
     <div>Presupuesto: <strong id="hdr-budget">€0</strong></div>
     <div>Moral: <strong id="hdr-morale">—</strong></div>
+    <button class="btn secondary" id="btn-new-game" style="padding:6px 12px;font-size:0.8rem;">Nueva partida</button>
   </div>
 </header>
 
@@ -266,6 +317,10 @@
           <div class="card"><div style="color:var(--muted);font-size:0.8rem;">Posición</div><div style="font-size:1.6rem;font-weight:800;" id="dash-pos">—</div></div>
           <div class="card"><div style="color:var(--muted);font-size:0.8rem;">Puntos</div><div style="font-size:1.6rem;font-weight:800;" id="dash-pts">—</div></div>
           <div class="card"><div style="color:var(--muted);font-size:0.8rem;">Forma</div><div class="form" id="dash-form" style="margin-top:6px;"></div></div>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div style="color:var(--muted);font-size:0.8rem;">Entrenador</div>
+          <div style="font-weight:700;font-size:1.1rem;" id="dash-manager">—</div>
         </div>
         <h3>Próximo partido</h3>
         <div id="next-match" class="card" style="margin-top:8px;">—</div>
@@ -406,7 +461,7 @@
       <table class="standings">
         <thead>
           <tr>
-            <th>#</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th>
+            <th>#</th><th>Equipo</th><th>Entrenador</th><th>PJ</th><th>G</th><th>E</th><th>P</th>
             <th>GF</th><th>GC</th><th>DG</th><th>Pts</th><th>Forma</th>
           </tr>
         </thead>
@@ -480,6 +535,7 @@
 <footer>
   Simulador inspirado en Football Manager · Versión web simplificada 2026 · No oficial
 </footer>
+</div><!-- fin game-ui -->
 
 <!-- Modal -->
 <div class="modal-bg" id="modal">
@@ -499,26 +555,26 @@ const FIRST_NAMES = ["Luka","Pedri","Gavi","Alejandro","Ferran","Rodri","Jude","
 const LAST_NAMES = ["García","Rodríguez","Martínez","López","González","Pérez","Sánchez","Ramírez","Torres","Flores","Rivera","Gómez","Díaz","Morales","Ortiz","Silva","Costa","Santos","Oliveira","Fernandes","Carvalho","Almeida","Pereira","Ribeiro","Moreira","Barbosa","Castillo","Vargas","Reyes","Cruz","Molina","Herrera","Jiménez","Ruiz","Alonso","Navarro","Romero","Soto","Delgado","Castro","Ramos","Vega","Méndez","Guerrero","Núñez","Rojas","Medina","Aguilar","Paredes","Quintero"];
 
 const CLUBS = [
-  { id: "rm", name: "Real Madrid", short: "RMA", strength: 92, budget: 180 },
-  { id: "bar", name: "FC Barcelona", short: "BAR", strength: 90, budget: 120 },
-  { id: "atm", name: "Atlético Madrid", short: "ATM", strength: 86, budget: 90 },
-  { id: "sev", name: "Sevilla FC", short: "SEV", strength: 78, budget: 45 },
-  { id: "rso", name: "Real Sociedad", short: "RSO", strength: 80, budget: 40 },
-  { id: "vil", name: "Villarreal", short: "VIL", strength: 79, budget: 38 },
-  { id: "bet", name: "Real Betis", short: "BET", strength: 77, budget: 35 },
-  { id: "ath", name: "Athletic Club", short: "ATH", strength: 81, budget: 42 },
-  { id: "val", name: "Valencia CF", short: "VAL", strength: 74, budget: 28 },
-  { id: "gir", name: "Girona FC", short: "GIR", strength: 76, budget: 30 },
-  { id: "osa", name: "Osasuna", short: "OSA", strength: 73, budget: 18 },
-  { id: "get", name: "Getafe CF", short: "GET", strength: 72, budget: 15 },
-  { id: "cel", name: "Celta de Vigo", short: "CEL", strength: 73, budget: 20 },
-  { id: "mal", name: "RCD Mallorca", short: "MAL", strength: 71, budget: 16 },
-  { id: "ray", name: "Rayo Vallecano", short: "RAY", strength: 72, budget: 14 },
-  { id: "las", name: "UD Las Palmas", short: "LPA", strength: 70, budget: 12 },
-  { id: "ala", name: "Deportivo Alavés", short: "ALA", strength: 69, budget: 11 },
-  { id: "cad", name: "Cádiz CF", short: "CAD", strength: 68, budget: 10 },
-  { id: "gra", name: "Granada CF", short: "GRA", strength: 67, budget: 9 },
-  { id: "alm", name: "UD Almería", short: "ALM", strength: 66, budget: 8 }
+  { id: "rm",  name: "Real Madrid",       short: "RMA", strength: 92, budget: 180, manager: "Xabi Alonso" },
+  { id: "bar", name: "FC Barcelona",      short: "BAR", strength: 90, budget: 120, manager: "Hansi Flick" },
+  { id: "atm", name: "Atlético Madrid",   short: "ATM", strength: 86, budget: 90,  manager: "Diego Simeone" },
+  { id: "sev", name: "Sevilla FC",        short: "SEV", strength: 78, budget: 45,  manager: "Matías Almeyda" },
+  { id: "rso", name: "Real Sociedad",     short: "RSO", strength: 80, budget: 40,  manager: "Pellegrino Matarazzo" },
+  { id: "vil", name: "Villarreal",        short: "VIL", strength: 79, budget: 38,  manager: "Marcelino" },
+  { id: "bet", name: "Real Betis",        short: "BET", strength: 77, budget: 35,  manager: "Manuel Pellegrini" },
+  { id: "ath", name: "Athletic Club",     short: "ATH", strength: 81, budget: 42,  manager: "Ernesto Valverde" },
+  { id: "val", name: "Valencia CF",       short: "VAL", strength: 74, budget: 28,  manager: "Carlos Corberán" },
+  { id: "gir", name: "Girona FC",         short: "GIR", strength: 76, budget: 30,  manager: "Míchel" },
+  { id: "osa", name: "Osasuna",           short: "OSA", strength: 73, budget: 18,  manager: "Alessio Lisci" },
+  { id: "get", name: "Getafe CF",         short: "GET", strength: 72, budget: 15,  manager: "José Bordalás" },
+  { id: "cel", name: "Celta de Vigo",     short: "CEL", strength: 73, budget: 20,  manager: "Claudio Giráldez" },
+  { id: "mal", name: "RCD Mallorca",      short: "MAL", strength: 71, budget: 16,  manager: "Jagoba Arrasate" },
+  { id: "ray", name: "Rayo Vallecano",    short: "RAY", strength: 72, budget: 14,  manager: "Iñigo Pérez" },
+  { id: "las", name: "UD Las Palmas",     short: "LPA", strength: 70, budget: 12,  manager: "Luis García Plaza" },
+  { id: "ala", name: "Deportivo Alavés",  short: "ALA", strength: 69, budget: 11,  manager: "Eduardo Coudet" },
+  { id: "cad", name: "Cádiz CF",          short: "CAD", strength: 68, budget: 10,  manager: "Mauricio Pellegrino" },
+  { id: "gra", name: "Granada CF",        short: "GRA", strength: 67, budget: 9,   manager: "Fran Escribá" },
+  { id: "alm", name: "UD Almería",        short: "ALM", strength: 66, budget: 8,   manager: "Rubi" }
 ];
 
 const FORMATIONS = {
@@ -564,11 +620,11 @@ const FORMATIONS = {
 
 // ==================== GAME STATE ====================
 let state = {
-  userClubId: "bar",
+  userClubId: null,
   season: "2025/26",
   matchday: 1,
   maxMatchdays: 38,
-  budget: 120,
+  budget: 0,
   morale: 75,
   formation: "4-2-3-1",
   mentality: "balanced",
@@ -584,7 +640,8 @@ let state = {
   inbox: [],
   transferList: [],
   matchPlayedThisMD: false,
-  trainingApplied: false
+  trainingApplied: false,
+  selectedClubId: null
 };
 
 // ==================== UTILITIES ====================
@@ -622,14 +679,10 @@ function generatePlayer(pos, quality = 70) {
 
 function generateSquad(strength) {
   const squad = [];
-  // GK
   squad.push(generatePlayer("GK", strength - 5));
   squad.push(generatePlayer("GK", strength - 18));
-  // DEF
   for (let i = 0; i < 8; i++) squad.push(generatePlayer("DEF", strength - rand(0, 15)));
-  // MID
   for (let i = 0; i < 8; i++) squad.push(generatePlayer("MID", strength - rand(0, 14)));
-  // ATT
   for (let i = 0; i < 6; i++) squad.push(generatePlayer("ATT", strength - rand(0, 12)));
   return squad.sort((a,b) => b.ca - a.ca);
 }
@@ -644,12 +697,9 @@ function initTeams() {
       form: []
     };
   });
-  state.players = state.teams[state.userClubId].players;
-  state.budget = state.teams[state.userClubId].budget;
 }
 
 function generateFixtures() {
-  // Simple round-robin simplified: each team plays every other once home/away approximated
   const ids = CLUBS.map(c => c.id);
   const fixtures = [];
   for (let md = 1; md <= 38; md++) {
@@ -685,7 +735,6 @@ function calcTeamStrength(teamId, isUser = false) {
   const players = team.players.filter(p => !p.injured).slice(0, 11);
   if (players.length < 11) return team.strength * 0.7;
   let avg = players.reduce((s,p) => s + p.ca * (p.condition/100) * (p.form/7), 0) / 11;
-  // Tactics modifiers for user
   if (isUser) {
     const mentMod = { defensive: -3, cautious: -1.5, balanced: 0, positive: 1.5, attacking: 3 }[state.mentality] || 0;
     const styleMod = { possession: 1, counter: 0.5, direct: 0, gegenpress: 2, tiki: 1.5 }[state.style] || 0;
@@ -703,12 +752,10 @@ function simulateMatch(homeId, awayId) {
   const aExp = Math.pow(awayStr, 1.35) / 18;
 
   let hg = 0, ag = 0;
-  // Poisson-ish
   for (let i = 0; i < 6; i++) {
     if (Math.random() < hExp / 6) hg++;
     if (Math.random() < aExp / 6) ag++;
   }
-  // Extra variance
   if (Math.random() < 0.15) hg += rand(0,1);
   if (Math.random() < 0.15) ag += rand(0,1);
 
@@ -718,7 +765,6 @@ function simulateMatch(homeId, awayId) {
   const homePlayers = state.teams[homeId].players.filter(p => !p.injured);
   const awayPlayers = state.teams[awayId].players.filter(p => !p.injured);
 
-  // Generate events
   const totalGoals = hg + ag;
   const minutes = [];
   for (let i = 0; i < totalGoals; i++) minutes.push(rand(3, 92));
@@ -737,7 +783,6 @@ function simulateMatch(homeId, awayId) {
     }
   });
 
-  // Cards & other
   for (let i = 0; i < rand(1,4); i++) {
     const min = rand(10, 90);
     const team = Math.random() < 0.5 ? homeName : awayName;
@@ -771,7 +816,6 @@ function applyResult(homeId, awayId, hg, ag) {
   home.form = home.form.slice(0,5);
   away.form = away.form.slice(0,5);
 
-  // Morale impact for user
   if (homeId === state.userClubId || awayId === state.userClubId) {
     const userWon = (homeId === state.userClubId && hg > ag) || (awayId === state.userClubId && ag > hg);
     const userDrew = hg === ag;
@@ -785,6 +829,7 @@ function applyResult(homeId, awayId, hg, ag) {
 function updateHeader() {
   const club = state.teams[state.userClubId];
   document.getElementById("hdr-club").textContent = club.name;
+  document.getElementById("hdr-manager").textContent = club.manager;
   document.getElementById("hdr-season").textContent = state.season;
   document.getElementById("hdr-matchday").textContent = state.matchday;
   document.getElementById("hdr-budget").textContent = formatMoney(state.budget * 1000);
@@ -798,8 +843,8 @@ function renderDashboard() {
   document.getElementById("dash-pos").textContent = pos + "º";
   document.getElementById("dash-pts").textContent = club.pts;
   document.getElementById("dash-form").innerHTML = club.form.map(f => `<span class="${f}">${f}</span>`).join("") || "—";
+  document.getElementById("dash-manager").textContent = club.manager;
 
-  // Next match
   const mdFixtures = state.fixtures[state.matchday - 1] || [];
   const next = mdFixtures.find(f => f.home === state.userClubId || f.away === state.userClubId);
   const nextEl = document.getElementById("next-match");
@@ -808,7 +853,7 @@ function renderDashboard() {
     const opp = state.teams[isHome ? next.away : next.home];
     nextEl.innerHTML = `
       <div style="font-size:1.05rem;font-weight:700;">${isHome ? "Local vs" : "Visitante vs"} ${opp.name}</div>
-      <div style="color:var(--muted);margin-top:4px;">Jornada ${state.matchday} · Fuerza rival: ${opp.strength}</div>
+      <div style="color:var(--muted);margin-top:4px;">Jornada ${state.matchday} · Entrenador rival: ${opp.manager} · Fuerza: ${opp.strength}</div>
     `;
   } else if (state.matchday > state.maxMatchdays) {
     nextEl.innerHTML = `<div style="font-weight:700;">¡Temporada finalizada!</div>`;
@@ -816,7 +861,6 @@ function renderDashboard() {
     nextEl.innerHTML = `<div>Partido de esta jornada ya jugado. Continúa a la siguiente.</div>`;
   }
 
-  // News
   const feed = document.getElementById("news-feed");
   feed.innerHTML = state.news.slice(0, 6).map(n => `
     <div class="news-item">
@@ -852,8 +896,7 @@ function renderPitch() {
   const slots = FORMATIONS[state.formation] || FORMATIONS["4-2-3-1"];
   const available = state.players.filter(p => !p.injured).sort((a,b) => b.ca - a.ca);
   const used = new Set();
-  pitch.innerHTML = slots.map((slot, i) => {
-    // Find best player for position
+  pitch.innerHTML = slots.map((slot) => {
     let player = available.find(p => p.pos === slot.pos && !used.has(p.id));
     if (!player) player = available.find(p => !used.has(p.id));
     if (player) used.add(player.id);
@@ -872,6 +915,7 @@ function renderStandings() {
     <tr class="${t.id === state.userClubId ? 'you' : ''}">
       <td>${i+1}</td>
       <td>${t.name}${t.id === state.userClubId ? ' ★' : ''}</td>
+      <td style="font-size:0.8rem;color:var(--muted);">${t.manager}</td>
       <td>${t.played}</td>
       <td>${t.won}</td>
       <td>${t.drawn}</td>
@@ -928,19 +972,16 @@ function playUserMatch() {
   const fixture = mdFixtures.find(f => f.home === state.userClubId || f.away === state.userClubId);
   if (!fixture) return;
 
-  // Simulate all matches of the round first
   mdFixtures.forEach(f => {
-    if (f.home === state.userClubId || f.away === state.userClubId) return; // user later
+    if (f.home === state.userClubId || f.away === state.userClubId) return;
     const res = simulateMatch(f.home, f.away);
     applyResult(f.home, f.away, res.homeGoals, res.awayGoals);
   });
 
-  // User match
   const result = simulateMatch(fixture.home, fixture.away);
   applyResult(fixture.home, fixture.away, result.homeGoals, result.awayGoals);
   state.matchPlayedThisMD = true;
 
-  // Render match screen
   document.getElementById("match-home").textContent = state.teams[fixture.home].name;
   document.getElementById("match-away").textContent = state.teams[fixture.away].name;
   document.getElementById("match-score").textContent = `${result.homeGoals} - ${result.awayGoals}`;
@@ -955,7 +996,6 @@ function playUserMatch() {
   document.getElementById("btn-sim-match").style.display = "none";
   document.getElementById("btn-next-matchday").style.display = "inline-block";
 
-  // News
   const userIsHome = fixture.home === state.userClubId;
   const userGoals = userIsHome ? result.homeGoals : result.awayGoals;
   const oppGoals = userIsHome ? result.awayGoals : result.homeGoals;
@@ -964,12 +1004,10 @@ function playUserMatch() {
   else if (userGoals < oppGoals) addNews(`Derrota ${userGoals}-${oppGoals} ante ${oppName}`);
   else addNews(`Empate ${userGoals}-${oppGoals} contra ${oppName}`);
 
-  // Random inbox
   if (Math.random() < 0.4) {
     addInbox("Director Deportivo", "Análisis post-partido", "Buen esfuerzo del equipo. Debemos mejorar la transición defensiva.");
   }
 
-  // Switch to match screen
   showScreen("match");
   updateHeader();
 }
@@ -983,7 +1021,6 @@ function nextMatchday() {
   state.matchday++;
   state.matchPlayedThisMD = false;
   state.trainingApplied = false;
-  // Recover condition a bit
   state.players.forEach(p => {
     if (!p.injured) p.condition = clamp(p.condition + rand(5, 15), 50, 100);
     if (p.injured && Math.random() < 0.35) p.injured = false;
@@ -1037,7 +1074,6 @@ function applyTraining() {
     p.condition = clamp(p.condition + mods.cond + rand(-3,3), 40, 100);
     p.morale = clamp(p.morale + mods.morale + rand(-2,2), 25, 100);
     if (Math.random() < mods.risk) p.injured = true;
-    // Small CA growth for young players
     if (p.age < 24 && focus !== "recovery" && Math.random() < 0.15) {
       p.ca = clamp(p.ca + 1, 45, p.pa);
     }
@@ -1073,6 +1109,68 @@ function updateAll() {
   renderInbox();
 }
 
+// ==================== START / NEW GAME ====================
+function renderClubSelect() {
+  const grid = document.getElementById("club-select-grid");
+  grid.innerHTML = CLUBS.map(c => `
+    <div class="club-card" data-id="${c.id}">
+      <div class="cname">${c.name}</div>
+      <div class="cmanager">👔 ${c.manager}</div>
+      <div class="cstats">Fuerza: <strong>${c.strength}</strong> · Presupuesto: <strong>${formatMoney(c.budget * 1000)}</strong></div>
+    </div>
+  `).join("");
+
+  grid.querySelectorAll(".club-card").forEach(card => {
+    card.addEventListener("click", () => {
+      grid.querySelectorAll(".club-card").forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      state.selectedClubId = card.dataset.id;
+      document.getElementById("btn-start-game").disabled = false;
+    });
+  });
+}
+
+function startNewGame() {
+  if (!state.selectedClubId) return;
+  state.userClubId = state.selectedClubId;
+  state.matchday = 1;
+  state.morale = 75;
+  state.formation = "4-2-3-1";
+  state.mentality = "balanced";
+  state.style = "gegenpress";
+  state.pressing = 70;
+  state.defLine = "standard";
+  state.tempo = "standard";
+  state.news = [];
+  state.inbox = [];
+  state.matchPlayedThisMD = false;
+  state.trainingApplied = false;
+
+  initTeams();
+  state.players = state.teams[state.userClubId].players;
+  state.budget = state.teams[state.userClubId].budget;
+  generateFixtures();
+  generateTransferList();
+
+  const club = state.teams[state.userClubId];
+  addNews(`Bienvenido a la temporada 2025/26. Diriges al ${club.name} bajo el mando de ${club.manager}. ¡Suerte!`);
+  addInbox("Presidencia", "Objetivos de la temporada", `Queremos clasificarnos para competición europea. Presupuesto de fichajes: ${formatMoney(state.budget * 1000)}. ¡Éxito, entrenador!`);
+
+  document.getElementById("start-screen").classList.add("hidden");
+  document.getElementById("game-ui").classList.add("visible");
+  updateAll();
+  showScreen("dashboard");
+}
+
+function resetToStartScreen() {
+  if (!confirm("¿Seguro que quieres empezar una nueva partida? Se perderá el progreso actual.")) return;
+  state.selectedClubId = null;
+  document.getElementById("btn-start-game").disabled = true;
+  document.getElementById("game-ui").classList.remove("visible");
+  document.getElementById("start-screen").classList.remove("hidden");
+  renderClubSelect();
+}
+
 // ==================== EVENTS ====================
 document.querySelectorAll("nav button").forEach(btn => {
   btn.addEventListener("click", () => showScreen(btn.dataset.screen));
@@ -1082,7 +1180,6 @@ document.getElementById("btn-continue").addEventListener("click", () => {
   if (state.matchPlayedThisMD) nextMatchday();
   else {
     showScreen("match");
-    // Pre-fill next match info
     const mdFixtures = state.fixtures[state.matchday - 1] || [];
     const fixture = mdFixtures.find(f => f.home === state.userClubId || f.away === state.userClubId);
     if (fixture) {
@@ -1117,14 +1214,11 @@ document.getElementById("btn-save-tactics").addEventListener("click", () => {
   setTimeout(() => document.getElementById("tactics-feedback").textContent = "", 2500);
 });
 document.getElementById("btn-apply-training").addEventListener("click", applyTraining);
+document.getElementById("btn-start-game").addEventListener("click", startNewGame);
+document.getElementById("btn-new-game").addEventListener("click", resetToStartScreen);
 
-// Init
-initTeams();
-generateFixtures();
-generateTransferList();
-addNews("Bienvenido a la temporada 2025/26. ¡Suerte, entrenador!");
-addInbox("Presidencia", "Objetivos de la temporada", "Queremos clasificarnos para Champions. Presupuesto de fichajes disponible. ¡Éxito!");
-updateAll();
+// Init: mostrar selector de club
+renderClubSelect();
 </script>
 </body>
 </html>
