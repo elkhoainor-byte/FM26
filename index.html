@@ -431,28 +431,69 @@ function calcTeamStrength(teamId,isUser=false){
   return clamp(avg,40,99);
 }
 
-function simulateMatch(homeId,awayId){
-  const homeStr=calcTeamStrength(homeId,homeId===state.userClubId);
-  const awayStr=calcTeamStrength(awayId,awayId===state.userClubId);
-  const hExp=Math.pow(homeStr+4,1.35)/18,aExp=Math.pow(awayStr,1.35)/18;
-  let hg=0,ag=0;
-  for(let i=0;i<6;i++){if(Math.random()<hExp/6)hg++;if(Math.random()<aExp/6)ag++}
-  if(Math.random()<0.15)hg+=rand(0,1);if(Math.random()<0.15)ag+=rand(0,1);
-  const events=[],homeName=state.teams[homeId].name,awayName=state.teams[awayId].name;
-  const homePlayers=state.teams[homeId].players.filter(p=>!p.injured);
-  const awayPlayers=state.teams[awayId].players.filter(p=>!p.injured);
-  const minutes=[];for(let i=0;i<hg+ag;i++)minutes.push(rand(3,92));minutes.sort((a,b)=>a-b);
-  let hs=0,as=0;
-  minutes.forEach(min=>{
-    if(hs<hg&&(as>=ag||Math.random()<0.55)){const scorer=pick(homePlayers.filter(p=>p.pos==="ATT"||p.pos==="MID")||homePlayers);events.push({min,type:"goal",text:`⚽ GOL! ${scorer.name} (${homeName})`});hs++}
-    else if(as<ag){const scorer=pick(awayPlayers.filter(p=>p.pos==="ATT"||p.pos==="MID")||awayPlayers);events.push({min,type:"goal",text:`⚽ GOL! ${scorer.name} (${awayName})`});as++}
-  });
-  for(let i=0;i<rand(1,4);i++){
-    const min=rand(10,90),team=Math.random()<0.5?homeName:awayName,players=team===homeName?homePlayers:awayPlayers,p=pick(players);
-    events.push(Math.random()<0.85?{min,type:"card-y",text:`🟨 Tarjeta amarilla para ${p.name} (${team})`}:{min,type:"card-r",text:`🟥 ¡Tarjeta roja! ${p.name} (${team})`});
+function simulateMatch(homeId, awayId) {
+  var homeStr = calcTeamStrength(homeId, homeId === state.userClubId);
+  var awayStr = calcTeamStrength(awayId, awayId === state.userClubId);
+
+  // Goles esperados realistas (~0.7 a 2.8)
+  var hExp = 0.55 + (homeStr / 45) + 0.25; // ventaja local
+  var aExp = 0.50 + (awayStr / 48);
+
+  // Muestreo tipo Poisson limitado
+  function goalsFromExp(exp) {
+    var g = 0;
+    var attempts = 14;
+    var p = Math.min(0.42, exp / attempts);
+    for (var i = 0; i < attempts; i++) {
+      if (Math.random() < p) g++;
+    }
+    // un poco de varianza extra
+    if (Math.random() < 0.12) g += rand(0, 1);
+    if (Math.random() < 0.08 && g > 0) g -= 1;
+    return Math.max(0, Math.min(g, 7));
   }
-  events.sort((a,b)=>a.min-b.min);
-  return{homeGoals:hg,awayGoals:ag,events};
+
+  var hg = goalsFromExp(hExp);
+  var ag = goalsFromExp(aExp);
+
+  var events = [];
+  var homeName = state.teams[homeId].name;
+  var awayName = state.teams[awayId].name;
+  var homePlayers = state.teams[homeId].players.filter(function(p) { return !p.injured; });
+  var awayPlayers = state.teams[awayId].players.filter(function(p) { return !p.injured; });
+
+  var minutes = [];
+  for (var j = 0; j < hg + ag; j++) minutes.push(rand(3, 92));
+  minutes.sort(function(a, b) { return a - b; });
+
+  var hs = 0, as_ = 0;
+  minutes.forEach(function(min) {
+    if (hs < hg && (as_ >= ag || Math.random() < 0.55)) {
+      var pool = homePlayers.filter(function(p) { return p.pos === "ATT" || p.pos === "MID"; });
+      var scorer = pick(pool.length ? pool : homePlayers);
+      events.push({ min: min, type: "goal", text: "⚽ GOL! " + scorer.name + " (" + homeName + ")" });
+      hs++;
+    } else if (as_ < ag) {
+      var pool2 = awayPlayers.filter(function(p) { return p.pos === "ATT" || p.pos === "MID"; });
+      var scorer2 = pick(pool2.length ? pool2 : awayPlayers);
+      events.push({ min: min, type: "goal", text: "⚽ GOL! " + scorer2.name + " (" + awayName + ")" });
+      as_++;
+    }
+  });
+
+  for (var k = 0; k < rand(1, 4); k++) {
+    var min2 = rand(10, 90);
+    var team = Math.random() < 0.5 ? homeName : awayName;
+    var pl = team === homeName ? homePlayers : awayPlayers;
+    var p = pick(pl);
+    if (Math.random() < 0.85) {
+      events.push({ min: min2, type: "card-y", text: "🟨 Tarjeta amarilla para " + p.name + " (" + team + ")" });
+    } else {
+      events.push({ min: min2, type: "card-r", text: "🟥 ¡Tarjeta roja! " + p.name + " (" + team + ")" });
+    }
+  }
+  events.sort(function(a, b) { return a.min - b.min; });
+  return { homeGoals: hg, awayGoals: ag, events: events };
 }
 
 function applyResult(homeId,awayId,hg,ag){
