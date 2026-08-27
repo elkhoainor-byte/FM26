@@ -5,280 +5,110 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Football Manager 2026 - Simulador Web</title>
 <style>
-  :root {
-    --bg: #0f1419;
-    --panel: #1a2332;
-    --accent: #00d4aa;
-    --accent2: #ff6b35;
-    --text: #e8eef5;
-    --muted: #8b9bb4;
-    --win: #2ecc71;
-    --draw: #f1c40f;
-    --loss: #e74c3c;
-    --border: #2a3a4f;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    line-height: 1.4;
-  }
-  header {
-    background: linear-gradient(90deg, #0a1628, #1a2a3a);
-    border-bottom: 2px solid var(--accent);
-    padding: 12px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .logo { font-weight: 800; font-size: 1.4rem; color: var(--accent); letter-spacing: -0.5px; }
-  .logo span { color: var(--text); font-weight: 400; }
-  .header-info { display: flex; gap: 20px; font-size: 0.9rem; color: var(--muted); flex-wrap: wrap; }
-  .header-info strong { color: var(--accent); }
-  nav {
-    display: flex;
-    gap: 6px;
-    background: var(--panel);
-    padding: 8px 16px;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-  nav button {
-    background: transparent;
-    border: 1px solid transparent;
-    color: var(--muted);
-    padding: 8px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: all 0.15s;
-  }
-  nav button:hover, nav button.active {
-    background: rgba(0,212,170,0.12);
-    color: var(--accent);
-    border-color: var(--accent);
-  }
-  main { max-width: 1400px; margin: 0 auto; padding: 20px; }
-  .screen { display: none; }
-  .screen.active { display: block; animation: fadeIn 0.25s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  .panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px;
-    margin-bottom: 18px;
-  }
-  h2 { font-size: 1.25rem; margin-bottom: 14px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
-  h3 { font-size: 1rem; margin-bottom: 10px; color: var(--text); }
-  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-  th, td { padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--border); }
-  th { color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; }
-  tr:hover td { background: rgba(255,255,255,0.03); }
-  .pos { font-weight: 700; width: 36px; }
-  .pos.GK { color: #f39c12; }
-  .pos.DEF { color: #3498db; }
-  .pos.MID { color: #2ecc71; }
-  .pos.ATT { color: #e74c3c; }
-  .stat { font-variant-numeric: tabular-nums; }
-  .rating { font-weight: 700; color: var(--accent); }
-  .btn {
-    background: var(--accent);
-    color: #0a1628;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 6px;
-    font-weight: 700;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: transform 0.1s, filter 0.15s;
-  }
-  .btn:hover { filter: brightness(1.1); }
-  .btn:active { transform: scale(0.97); }
-  .btn.secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
-  .btn.danger { background: var(--loss); color: white; }
-  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-  @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
-  .card {
-    background: rgba(0,0,0,0.25);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px;
-  }
-  .formation-pitch {
-    background: linear-gradient(180deg, #1a5c2e 0%, #0d3d1f 100%);
-    border-radius: 8px;
-    height: 420px;
-    position: relative;
-    border: 2px solid #2d8a4e;
-    overflow: hidden;
-  }
-  .formation-pitch::before {
-    content: '';
-    position: absolute;
-    inset: 10%;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 4px;
-  }
-  .player-token {
-    position: absolute;
-    width: 48px;
-    height: 48px;
-    background: var(--panel);
-    border: 2px solid var(--accent);
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.65rem;
-    cursor: pointer;
-    transform: translate(-50%, -50%);
-    transition: transform 0.15s;
-    z-index: 2;
-  }
-  .player-token:hover { transform: translate(-50%, -50%) scale(1.12); border-color: white; }
-  .player-token .num { font-weight: 800; font-size: 0.85rem; color: var(--accent); }
-  .player-token .name { font-size: 0.55rem; color: var(--muted); max-width: 44px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .match-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border);
-  }
-  .team-block { text-align: center; flex: 1; }
-  .team-block .name { font-size: 1.1rem; font-weight: 700; }
-  .score-big { font-size: 2.8rem; font-weight: 800; color: var(--accent); letter-spacing: 4px; }
-  .events { max-height: 280px; overflow-y: auto; font-size: 0.88rem; }
-  .event { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 10px; }
-  .event .min { color: var(--muted); width: 36px; font-variant-numeric: tabular-nums; }
-  .event.goal { color: var(--win); }
-  .event.card-y { color: #f1c40f; }
-  .event.card-r { color: var(--loss); }
-  .standings td:nth-child(1) { width: 28px; font-weight: 700; }
-  .standings .you { background: rgba(0,212,170,0.1); }
-  .form span {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    border-radius: 3px;
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-align: center;
-    line-height: 18px;
-    margin-right: 2px;
-  }
-  .form .W { background: var(--win); color: #0a1628; }
-  .form .D { background: var(--draw); color: #0a1628; }
-  .form .L { background: var(--loss); color: white; }
-  .tactics-grid { display: grid; grid-template-columns: 1fr 280px; gap: 18px; }
-  @media (max-width: 1000px) { .tactics-grid { grid-template-columns: 1fr; } }
-  select, input[type="range"] {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 7px 10px;
-    border-radius: 5px;
-    width: 100%;
-    font-size: 0.88rem;
-  }
-  label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
-  .control-group { margin-bottom: 14px; }
-  .bar {
-    height: 6px;
-    background: var(--bg);
-    border-radius: 3px;
-    overflow: hidden;
-    margin-top: 4px;
-  }
-  .bar span { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
-  .news-item { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-  .news-item .date { color: var(--muted); font-size: 0.75rem; }
-  .modal-bg {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-    display: none; align-items: center; justify-content: center; z-index: 200;
-  }
-  .modal-bg.show { display: flex; }
-  .modal {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    max-width: 480px;
-    width: 90%;
-  }
-  .modal h3 { margin-bottom: 12px; color: var(--accent); }
-  .flex { display: flex; gap: 10px; align-items: center; }
-  .flex-between { display: flex; justify-content: space-between; align-items: center; }
-  .badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    background: rgba(0,212,170,0.15);
-    color: var(--accent);
-  }
-  .injury { color: var(--loss); font-size: 0.75rem; }
-  footer { text-align: center; padding: 20px; color: var(--muted); font-size: 0.8rem; }
+:root{--bg:#0f1419;--panel:#1a2332;--accent:#00d4aa;--accent2:#ff6b35;--text:#e8eef5;--muted:#8b9bb4;--win:#2ecc71;--draw:#f1c40f;--loss:#e74c3c;--border:#2a3a4f}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.4}
+header{background:linear-gradient(90deg,#0a1628,#1a2a3a);border-bottom:2px solid var(--accent);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:8px}
+.logo{font-weight:800;font-size:1.4rem;color:var(--accent)}.logo span{color:var(--text);font-weight:400}
+.header-info{display:flex;gap:14px;font-size:.85rem;color:var(--muted);flex-wrap:wrap;align-items:center}.header-info strong{color:var(--accent)}
+nav{display:flex;gap:6px;background:var(--panel);padding:8px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+nav button{background:transparent;border:1px solid transparent;color:var(--muted);padding:8px 14px;border-radius:6px;cursor:pointer;font-size:.85rem;transition:all .15s}
+nav button:hover,nav button.active{background:rgba(0,212,170,.12);color:var(--accent);border-color:var(--accent)}
+main{max-width:1400px;margin:0 auto;padding:20px}
+.screen{display:none}.screen.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:18px}
+h2{font-size:1.25rem;margin-bottom:14px;color:var(--accent);display:flex;align-items:center;gap:8px}
+h3{font-size:1rem;margin-bottom:10px;color:var(--text)}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.4px}
+tr:hover td{background:rgba(255,255,255,.03)}
+.pos{font-weight:700;width:36px}.pos.GK{color:#f39c12}.pos.DEF{color:#3498db}.pos.MID{color:#2ecc71}.pos.ATT{color:#e74c3c}
+.stat{font-variant-numeric:tabular-nums}.rating{font-weight:700;color:var(--accent)}
+.btn{background:var(--accent);color:#0a1628;border:none;padding:10px 18px;border-radius:6px;font-weight:700;cursor:pointer;font-size:.9rem;transition:transform .1s,filter .15s}
+.btn:hover{filter:brightness(1.1)}.btn:active{transform:scale(.97)}
+.btn.secondary{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn.danger{background:var(--loss);color:#fff}.btn:disabled{opacity:.45;cursor:not-allowed}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+@media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+.card{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:8px;padding:14px}
+.formation-pitch{background:linear-gradient(180deg,#1a5c2e 0%,#0d3d1f 100%);border-radius:8px;height:420px;position:relative;border:2px solid #2d8a4e;overflow:hidden}
+.formation-pitch::before{content:'';position:absolute;inset:10%;border:1px solid rgba(255,255,255,.2);border-radius:4px}
+.player-token{position:absolute;width:48px;height:48px;background:var(--panel);border:2px solid var(--accent);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.65rem;cursor:pointer;transform:translate(-50%,-50%);transition:transform .15s;z-index:2}
+.player-token:hover{transform:translate(-50%,-50%) scale(1.12);border-color:#fff}
+.player-token .num{font-weight:800;font-size:.85rem;color:var(--accent)}
+.player-token .name{font-size:.55rem;color:var(--muted);max-width:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.match-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.team-block{text-align:center;flex:1}.team-block .name{font-size:1.1rem;font-weight:700}
+.score-big{font-size:2.8rem;font-weight:800;color:var(--accent);letter-spacing:4px}
+.events{max-height:280px;overflow-y:auto;font-size:.88rem}
+.event{padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;gap:10px}
+.event .min{color:var(--muted);width:36px;font-variant-numeric:tabular-nums}
+.event.goal{color:var(--win)}.event.card-y{color:#f1c40f}.event.card-r{color:var(--loss)}
+.standings td:nth-child(1){width:28px;font-weight:700}.standings .you{background:rgba(0,212,170,.1)}
+.form span{display:inline-block;width:18px;height:18px;border-radius:3px;font-size:.65rem;font-weight:700;text-align:center;line-height:18px;margin-right:2px}
+.form .W{background:var(--win);color:#0a1628}.form .D{background:var(--draw);color:#0a1628}.form .L{background:var(--loss);color:#fff}
+.tactics-grid{display:grid;grid-template-columns:1fr 280px;gap:18px}
+@media(max-width:1000px){.tactics-grid{grid-template-columns:1fr}}
+select,input[type=range]{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:5px;width:100%;font-size:.88rem}
+label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:4px}
+.control-group{margin-bottom:14px}
+.bar{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-top:4px}
+.bar span{display:block;height:100%;background:var(--accent);border-radius:3px}
+.news-item{padding:10px 0;border-bottom:1px solid var(--border);font-size:.9rem}
+.news-item .date{color:var(--muted);font-size:.75rem}
+.flex{display:flex;gap:10px;align-items:center}
+.flex-between{display:flex;justify-content:space-between;align-items:center}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:700;background:rgba(0,212,170,.15);color:var(--accent)}
+.injury{color:var(--loss);font-size:.75rem}
+footer{text-align:center;padding:20px;color:var(--muted);font-size:.8rem}
 
-  /* START SCREEN */
-  #start-screen {
-    position: fixed; inset: 0; background: var(--bg); z-index: 300;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 20px; overflow-y: auto;
-  }
-  #start-screen.hidden { display: none; }
-  .start-logo { font-size: 2.8rem; font-weight: 800; color: var(--accent); margin-bottom: 8px; }
-  .start-logo span { color: var(--text); font-weight: 400; }
-  .start-sub { color: var(--muted); margin-bottom: 32px; font-size: 1.05rem; }
-  .club-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
-    max-width: 980px;
-    width: 100%;
-    margin-bottom: 24px;
-  }
-  .club-card {
-    background: var(--panel);
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: left;
-  }
-  .club-card:hover, .club-card.selected {
-    border-color: var(--accent);
-    background: rgba(0,212,170,0.08);
-  }
-  .club-card .cname { font-weight: 700; font-size: 1rem; }
-  .club-card .cmanager { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
-  .club-card .cstats { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
-  .club-card .cstats strong { color: var(--accent); }
-  #game-ui { display: none; }
-  #game-ui.visible { display: block; }
+/* START MENU */
+#start-menu{position:fixed;inset:0;background:var(--bg);z-index:400;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+#start-menu.hidden{display:none}
+.start-logo{font-size:3rem;font-weight:800;color:var(--accent);margin-bottom:6px}
+.start-logo span{color:var(--text);font-weight:400}
+.start-sub{color:var(--muted);margin-bottom:36px;font-size:1.05rem}
+.start-actions{display:flex;flex-direction:column;gap:14px;width:100%;max-width:360px}
+.start-actions .btn{width:100%;padding:14px;font-size:1.05rem}
+.start-actions .btn.secondary{border-width:2px}
+#club-select-view{display:none;width:100%;max-width:980px}
+#club-select-view.visible{display:block}
+.club-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin:20px 0 24px;max-height:55vh;overflow-y:auto}
+.club-card{background:var(--panel);border:2px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s;text-align:left}
+.club-card:hover,.club-card.selected{border-color:var(--accent);background:rgba(0,212,170,.08)}
+.club-card .cname{font-weight:700;font-size:1rem}
+.club-card .cmanager{color:var(--muted);font-size:.8rem;margin-top:4px}
+.club-card .cstats{font-size:.78rem;color:var(--muted);margin-top:6px}
+.club-card .cstats strong{color:var(--accent)}
+#game-ui{display:none}#game-ui.visible{display:block}
+.save-info{font-size:.85rem;color:var(--muted);margin-top:8px;text-align:center}
 </style>
 </head>
 <body>
 
-<!-- ========== PANTALLA DE INICIO ========== -->
-<div id="start-screen">
+<!-- ========== MENÚ PRINCIPAL ========== -->
+<div id="start-menu">
   <div class="start-logo">FM<span>26 Web</span></div>
-  <div class="start-sub">Simulador de Football Manager · Temporada 2025/26</div>
-  <h2 style="margin-bottom:16px;">Elige tu club</h2>
-  <div class="club-grid" id="club-select-grid"></div>
-  <button class="btn" id="btn-start-game" disabled style="font-size:1.05rem;padding:12px 28px;">Comenzar temporada</button>
+  <div class="start-sub">Simulador inspirado en Football Manager · Datos basados en sortitoutsi.net</div>
+  
+  <div id="main-menu-view" class="start-actions">
+    <button class="btn" id="btn-continue-career" style="display:none">▶ Seguir carrera</button>
+    <button class="btn" id="btn-new-career">＋ Comenzar partida nueva</button>
+    <div class="save-info" id="save-info"></div>
+  </div>
+
+  <div id="club-select-view">
+    <h2 style="text-align:center;margin-bottom:8px">Elige tu club · La Liga 2025/26</h2>
+    <p style="text-align:center;color:var(--muted);margin-bottom:8px;font-size:.9rem">Datos de clubs, presupuestos y ratings extraídos de sortitoutsi.net</p>
+    <div class="club-grid" id="club-select-grid"></div>
+    <div style="text-align:center;display:flex;gap:12px;justify-content:center">
+      <button class="btn secondary" id="btn-back-menu">← Volver</button>
+      <button class="btn" id="btn-start-game" disabled>Comenzar temporada</button>
+    </div>
+  </div>
 </div>
 
 <!-- ========== UI DEL JUEGO ========== -->
@@ -292,7 +122,8 @@
     <div>Jornada: <strong id="hdr-matchday">1</strong></div>
     <div>Presupuesto: <strong id="hdr-budget">€0</strong></div>
     <div>Moral: <strong id="hdr-morale">—</strong></div>
-    <button class="btn secondary" id="btn-new-game" style="padding:6px 12px;font-size:0.8rem;">Nueva partida</button>
+    <button class="btn secondary" id="btn-save" style="padding:6px 12px;font-size:.8rem">Guardar</button>
+    <button class="btn secondary" id="btn-new-game" style="padding:6px 12px;font-size:.8rem">Menú</button>
   </div>
 </header>
 
@@ -308,25 +139,22 @@
 </nav>
 
 <main>
-  <!-- DASHBOARD -->
   <section id="dashboard" class="screen active">
     <div class="grid-2">
       <div class="panel">
         <h2>📊 Resumen del Club</h2>
-        <div class="grid-3" style="margin-bottom:16px;">
-          <div class="card"><div style="color:var(--muted);font-size:0.8rem;">Posición</div><div style="font-size:1.6rem;font-weight:800;" id="dash-pos">—</div></div>
-          <div class="card"><div style="color:var(--muted);font-size:0.8rem;">Puntos</div><div style="font-size:1.6rem;font-weight:800;" id="dash-pts">—</div></div>
-          <div class="card"><div style="color:var(--muted);font-size:0.8rem;">Forma</div><div class="form" id="dash-form" style="margin-top:6px;"></div></div>
+        <div class="grid-3" style="margin-bottom:16px">
+          <div class="card"><div style="color:var(--muted);font-size:.8rem">Posición</div><div style="font-size:1.6rem;font-weight:800" id="dash-pos">—</div></div>
+          <div class="card"><div style="color:var(--muted);font-size:.8rem">Puntos</div><div style="font-size:1.6rem;font-weight:800" id="dash-pts">—</div></div>
+          <div class="card"><div style="color:var(--muted);font-size:.8rem">Forma</div><div class="form" id="dash-form" style="margin-top:6px"></div></div>
         </div>
-        <div class="card" style="margin-bottom:12px;">
-          <div style="color:var(--muted);font-size:0.8rem;">Entrenador</div>
-          <div style="font-weight:700;font-size:1.1rem;" id="dash-manager">—</div>
+        <div class="card" style="margin-bottom:12px">
+          <div style="color:var(--muted);font-size:.8rem">Entrenador</div>
+          <div style="font-weight:700;font-size:1.1rem" id="dash-manager">—</div>
         </div>
         <h3>Próximo partido</h3>
-        <div id="next-match" class="card" style="margin-top:8px;">—</div>
-        <div style="margin-top:16px;">
-          <button class="btn" id="btn-continue">Continuar → Jugar jornada</button>
-        </div>
+        <div id="next-match" class="card" style="margin-top:8px">—</div>
+        <div style="margin-top:16px"><button class="btn" id="btn-continue">Continuar → Jugar jornada</button></div>
       </div>
       <div class="panel">
         <h2>📰 Últimas noticias</h2>
@@ -335,34 +163,25 @@
     </div>
   </section>
 
-  <!-- SQUAD -->
   <section id="squad" class="screen">
     <div class="panel">
-      <div class="flex-between" style="margin-bottom:14px;">
+      <div class="flex-between" style="margin-bottom:14px">
         <h2>👥 Plantilla</h2>
-        <div class="flex">
-          <select id="squad-filter" style="width:auto;">
-            <option value="all">Todos</option>
-            <option value="GK">Porteros</option>
-            <option value="DEF">Defensas</option>
-            <option value="MID">Centrocampistas</option>
-            <option value="ATT">Delanteros</option>
-          </select>
-        </div>
+        <select id="squad-filter" style="width:auto">
+          <option value="all">Todos</option>
+          <option value="GK">Porteros</option>
+          <option value="DEF">Defensas</option>
+          <option value="MID">Centrocampistas</option>
+          <option value="ATT">Delanteros</option>
+        </select>
       </div>
       <table>
-        <thead>
-          <tr>
-            <th>Pos</th><th>Nombre</th><th>Edad</th><th>CA</th><th>PA</th>
-            <th>Cond</th><th>Moral</th><th>Valor</th><th>Sueldo</th><th>Estado</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Pos</th><th>Nombre</th><th>Edad</th><th>CA</th><th>PA</th><th>Cond</th><th>Moral</th><th>Valor</th><th>Sueldo</th><th>Estado</th></tr></thead>
         <tbody id="squad-table"></tbody>
       </table>
     </div>
   </section>
 
-  <!-- TACTICS -->
   <section id="tactics" class="screen">
     <div class="tactics-grid">
       <div class="panel">
@@ -371,854 +190,213 @@
       </div>
       <div class="panel">
         <h2>Instrucciones</h2>
-        <div class="control-group">
-          <label>Formación</label>
+        <div class="control-group"><label>Formación</label>
           <select id="formation-select">
-            <option value="4-2-3-1">4-2-3-1</option>
-            <option value="4-3-3">4-3-3</option>
-            <option value="4-4-2">4-4-2</option>
-            <option value="3-5-2">3-5-2</option>
-            <option value="4-1-4-1">4-1-4-1</option>
-            <option value="5-3-2">5-3-2</option>
+            <option value="4-2-3-1">4-2-3-1</option><option value="4-3-3">4-3-3</option><option value="4-4-2">4-4-2</option>
+            <option value="3-5-2">3-5-2</option><option value="4-1-4-1">4-1-4-1</option><option value="5-3-2">5-3-2</option>
           </select>
         </div>
-        <div class="control-group">
-          <label>Mentalidad</label>
+        <div class="control-group"><label>Mentalidad</label>
           <select id="mentality">
-            <option value="defensive">Defensiva</option>
-            <option value="cautious">Cautelosa</option>
-            <option value="balanced" selected>Equilibrada</option>
-            <option value="positive">Positiva</option>
-            <option value="attacking">Ofensiva</option>
+            <option value="defensive">Defensiva</option><option value="cautious">Cautelosa</option>
+            <option value="balanced" selected>Equilibrada</option><option value="positive">Positiva</option><option value="attacking">Ofensiva</option>
           </select>
         </div>
-        <div class="control-group">
-          <label>Estilo de juego</label>
+        <div class="control-group"><label>Estilo de juego</label>
           <select id="style">
-            <option value="possession">Posesión</option>
-            <option value="counter">Contraataque</option>
-            <option value="direct">Directo</option>
-            <option value="gegenpress" selected>Gegenpressing</option>
-            <option value="tiki">Tiki-taka</option>
+            <option value="possession">Posesión</option><option value="counter">Contraataque</option><option value="direct">Directo</option>
+            <option value="gegenpress" selected>Gegenpressing</option><option value="tiki">Tiki-taka</option>
           </select>
         </div>
-        <div class="control-group">
-          <label>Presión (0-100)</label>
+        <div class="control-group"><label>Presión (0-100)</label>
           <input type="range" id="pressing" min="0" max="100" value="70">
           <div class="bar"><span id="press-bar" style="width:70%"></span></div>
         </div>
-        <div class="control-group">
-          <label>Línea defensiva</label>
-          <select id="def-line">
-            <option value="low">Baja</option>
-            <option value="standard" selected>Estándar</option>
-            <option value="high">Alta</option>
-          </select>
+        <div class="control-group"><label>Línea defensiva</label>
+          <select id="def-line"><option value="low">Baja</option><option value="standard" selected>Estándar</option><option value="high">Alta</option></select>
         </div>
-        <div class="control-group">
-          <label>Ritmo de posesión</label>
-          <select id="tempo">
-            <option value="slow">Lento</option>
-            <option value="standard" selected>Estándar</option>
-            <option value="fast">Rápido</option>
-          </select>
+        <div class="control-group"><label>Ritmo de posesión</label>
+          <select id="tempo"><option value="slow">Lento</option><option value="standard" selected>Estándar</option><option value="fast">Rápido</option></select>
         </div>
-        <button class="btn" id="btn-save-tactics" style="width:100%;margin-top:10px;">Guardar táctica</button>
-        <div id="tactics-feedback" style="margin-top:10px;font-size:0.85rem;color:var(--accent);"></div>
+        <button class="btn" id="btn-save-tactics" style="width:100%;margin-top:10px">Guardar táctica</button>
+        <div id="tactics-feedback" style="margin-top:10px;font-size:.85rem;color:var(--accent)"></div>
       </div>
     </div>
   </section>
 
-  <!-- MATCH -->
   <section id="match" class="screen">
     <div class="panel">
       <div class="match-header">
-        <div class="team-block">
-          <div class="name" id="match-home">—</div>
-          <div style="font-size:0.8rem;color:var(--muted);" id="match-home-form"></div>
-        </div>
+        <div class="team-block"><div class="name" id="match-home">—</div></div>
         <div class="score-big" id="match-score">0 - 0</div>
-        <div class="team-block">
-          <div class="name" id="match-away">—</div>
-          <div style="font-size:0.8rem;color:var(--muted);" id="match-away-form"></div>
-        </div>
+        <div class="team-block"><div class="name" id="match-away">—</div></div>
       </div>
-      <div class="flex-between" style="margin-bottom:12px;">
-        <div id="match-status" style="color:var(--muted);">Listo para comenzar</div>
+      <div class="flex-between" style="margin-bottom:12px">
+        <div id="match-status" style="color:var(--muted)">Listo para comenzar</div>
         <div class="flex">
           <button class="btn" id="btn-sim-match">Simular partido</button>
-          <button class="btn secondary" id="btn-next-matchday" style="display:none;">Siguiente jornada</button>
+          <button class="btn secondary" id="btn-next-matchday" style="display:none">Siguiente jornada</button>
         </div>
       </div>
       <div class="events" id="match-events"></div>
     </div>
   </section>
 
-  <!-- LEAGUE -->
   <section id="league" class="screen">
     <div class="panel">
       <h2>🏆 Clasificación - La Liga 2025/26</h2>
       <table class="standings">
-        <thead>
-          <tr>
-            <th>#</th><th>Equipo</th><th>Entrenador</th><th>PJ</th><th>G</th><th>E</th><th>P</th>
-            <th>GF</th><th>GC</th><th>DG</th><th>Pts</th><th>Forma</th>
-          </tr>
-        </thead>
+        <thead><tr><th>#</th><th>Equipo</th><th>Entrenador</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th><th>Forma</th></tr></thead>
         <tbody id="standings-body"></tbody>
       </table>
     </div>
   </section>
 
-  <!-- TRANSFERS -->
   <section id="transfers" class="screen">
     <div class="panel">
-      <div class="flex-between" style="margin-bottom:14px;">
+      <div class="flex-between" style="margin-bottom:14px">
         <h2>💰 Mercado de fichajes</h2>
-        <div>Presupuesto disponible: <strong id="transfer-budget" style="color:var(--accent);">€0</strong></div>
+        <div>Presupuesto: <strong id="transfer-budget" style="color:var(--accent)">€0</strong></div>
       </div>
       <table>
-        <thead>
-          <tr>
-            <th>Pos</th><th>Jugador</th><th>Edad</th><th>CA</th><th>Club</th><th>Valor</th><th>Sueldo</th><th></th>
-          </tr>
-        </thead>
+        <thead><tr><th>Pos</th><th>Jugador</th><th>Edad</th><th>CA</th><th>Club</th><th>Valor</th><th>Sueldo</th><th></th></tr></thead>
         <tbody id="transfer-table"></tbody>
       </table>
     </div>
   </section>
 
-  <!-- INBOX -->
   <section id="inbox" class="screen">
-    <div class="panel">
-      <h2>📥 Bandeja de entrada</h2>
-      <div id="inbox-list"></div>
-    </div>
+    <div class="panel"><h2>📥 Bandeja de entrada</h2><div id="inbox-list"></div></div>
   </section>
 
-  <!-- TRAINING -->
   <section id="training" class="screen">
     <div class="panel">
       <h2>🏋️ Entrenamiento</h2>
-      <p style="color:var(--muted);margin-bottom:16px;">Asigna la intensidad y el foco semanal. Afecta a condición física, moral y desarrollo de atributos.</p>
+      <p style="color:var(--muted);margin-bottom:16px">Asigna intensidad y foco semanal.</p>
       <div class="grid-3">
-        <div class="card">
-          <h3>Intensidad</h3>
+        <div class="card"><h3>Intensidad</h3>
           <select id="train-intensity">
-            <option value="recovery">Recuperación</option>
-            <option value="light">Ligera</option>
-            <option value="medium" selected>Media</option>
-            <option value="high">Alta</option>
-            <option value="double">Doble sesión</option>
+            <option value="recovery">Recuperación</option><option value="light">Ligera</option>
+            <option value="medium" selected>Media</option><option value="high">Alta</option><option value="double">Doble sesión</option>
           </select>
         </div>
-        <div class="card">
-          <h3>Foco principal</h3>
+        <div class="card"><h3>Foco principal</h3>
           <select id="train-focus">
-            <option value="fitness">Condición física</option>
-            <option value="tactics">Táctica</option>
-            <option value="attacking">Ataque</option>
-            <option value="defending">Defensa</option>
-            <option value="setpieces">Balón parado</option>
+            <option value="fitness">Condición física</option><option value="tactics">Táctica</option>
+            <option value="attacking">Ataque</option><option value="defending">Defensa</option><option value="setpieces">Balón parado</option>
           </select>
         </div>
-        <div class="card">
-          <h3>Estado actual</h3>
-          <div id="train-status" style="font-size:0.9rem;margin-top:8px;">Listo</div>
-        </div>
+        <div class="card"><h3>Estado</h3><div id="train-status" style="font-size:.9rem;margin-top:8px">Listo</div></div>
       </div>
-      <button class="btn" id="btn-apply-training" style="margin-top:16px;">Aplicar entrenamiento semanal</button>
+      <button class="btn" id="btn-apply-training" style="margin-top:16px">Aplicar entrenamiento semanal</button>
     </div>
   </section>
 </main>
-
-<footer>
-  Simulador inspirado en Football Manager · Versión web simplificada 2026 · No oficial
-</footer>
-</div><!-- fin game-ui -->
-
-<!-- Modal -->
-<div class="modal-bg" id="modal">
-  <div class="modal">
-    <h3 id="modal-title">—</h3>
-    <div id="modal-body"></div>
-    <div class="flex" style="margin-top:18px;justify-content:flex-end;">
-      <button class="btn secondary" id="modal-cancel">Cancelar</button>
-      <button class="btn" id="modal-confirm">Confirmar</button>
-    </div>
-  </div>
+<footer>Simulador inspirado en Football Manager · Datos de clubs basados en sortitoutsi.net · No oficial</footer>
 </div>
 
 <script>
-// ==================== DATA ====================
-const FIRST_NAMES = ["Luka","Pedri","Gavi","Alejandro","Ferran","Rodri","Jude","Vinicius","Kylian","Erling","Harry","Mohamed","Kevin","Bruno","Phil","Bukayo","Martin","Federico","Lautaro","Rafael","João","Bernardo","Ilkay","Toni","Joshua","Jamal","Florian","Kai","Cole","Declan","Trent","Virgil","Ruben","William","Thibaut","Marc-André","Ederson","Alisson","Jan","Antonio","Theo","Achraf","Jules","Ronald","Frenkie","Mason","Marcus","Raheem","Jack","James"];
-const LAST_NAMES = ["García","Rodríguez","Martínez","López","González","Pérez","Sánchez","Ramírez","Torres","Flores","Rivera","Gómez","Díaz","Morales","Ortiz","Silva","Costa","Santos","Oliveira","Fernandes","Carvalho","Almeida","Pereira","Ribeiro","Moreira","Barbosa","Castillo","Vargas","Reyes","Cruz","Molina","Herrera","Jiménez","Ruiz","Alonso","Navarro","Romero","Soto","Delgado","Castro","Ramos","Vega","Méndez","Guerrero","Núñez","Rojas","Medina","Aguilar","Paredes","Quintero"];
-
+// ========== DATOS DE sortitoutsi.net (La Liga FM26) ==========
 const CLUBS = [
-  { id: "rm",  name: "Real Madrid",       short: "RMA", strength: 92, budget: 180, manager: "Xabi Alonso" },
-  { id: "bar", name: "FC Barcelona",      short: "BAR", strength: 90, budget: 120, manager: "Hansi Flick" },
-  { id: "atm", name: "Atlético Madrid",   short: "ATM", strength: 86, budget: 90,  manager: "Diego Simeone" },
-  { id: "sev", name: "Sevilla FC",        short: "SEV", strength: 78, budget: 45,  manager: "Matías Almeyda" },
-  { id: "rso", name: "Real Sociedad",     short: "RSO", strength: 80, budget: 40,  manager: "Pellegrino Matarazzo" },
-  { id: "vil", name: "Villarreal",        short: "VIL", strength: 79, budget: 38,  manager: "Marcelino" },
-  { id: "bet", name: "Real Betis",        short: "BET", strength: 77, budget: 35,  manager: "Manuel Pellegrini" },
-  { id: "ath", name: "Athletic Club",     short: "ATH", strength: 81, budget: 42,  manager: "Ernesto Valverde" },
-  { id: "val", name: "Valencia CF",       short: "VAL", strength: 74, budget: 28,  manager: "Carlos Corberán" },
-  { id: "gir", name: "Girona FC",         short: "GIR", strength: 76, budget: 30,  manager: "Míchel" },
-  { id: "osa", name: "Osasuna",           short: "OSA", strength: 73, budget: 18,  manager: "Alessio Lisci" },
-  { id: "get", name: "Getafe CF",         short: "GET", strength: 72, budget: 15,  manager: "José Bordalás" },
-  { id: "cel", name: "Celta de Vigo",     short: "CEL", strength: 73, budget: 20,  manager: "Claudio Giráldez" },
-  { id: "mal", name: "RCD Mallorca",      short: "MAL", strength: 71, budget: 16,  manager: "Jagoba Arrasate" },
-  { id: "ray", name: "Rayo Vallecano",    short: "RAY", strength: 72, budget: 14,  manager: "Iñigo Pérez" },
-  { id: "las", name: "UD Las Palmas",     short: "LPA", strength: 70, budget: 12,  manager: "Luis García Plaza" },
-  { id: "ala", name: "Deportivo Alavés",  short: "ALA", strength: 69, budget: 11,  manager: "Eduardo Coudet" },
-  { id: "cad", name: "Cádiz CF",          short: "CAD", strength: 68, budget: 10,  manager: "Mauricio Pellegrino" },
-  { id: "gra", name: "Granada CF",        short: "GRA", strength: 67, budget: 9,   manager: "Fran Escribá" },
-  { id: "alm", name: "UD Almería",        short: "ALM", strength: 66, budget: 8,   manager: "Rubi" }
+  {id:"rm", name:"Real Madrid", short:"RMA", strength:92, budget:43, wageBudget:5, balance:86, att:73170, manager:"Xabi Alonso", rating:90, potential:95},
+  {id:"bar", name:"FC Barcelona", short:"BAR", strength:90, budget:17, wageBudget:4, balance:22, att:70000, manager:"Hansi Flick", rating:89, potential:94},
+  {id:"atm", name:"Atlético Madrid", short:"ATM", strength:86, budget:13, wageBudget:3, balance:39, att:61161, manager:"Diego Simeone", rating:85, potential:92},
+  {id:"ath", name:"Athletic Club", short:"ATH", strength:82, budget:20, wageBudget:2, balance:53, att:48422, manager:"Ernesto Valverde", rating:82, potential:87},
+  {id:"vil", name:"Villarreal", short:"VIL", strength:81, budget:13, wageBudget:1, balance:32, att:18256, manager:"Marcelino", rating:81, potential:89},
+  {id:"rso", name:"Real Sociedad", short:"RSO", strength:80, budget:17, wageBudget:1, balance:42, att:32288, manager:"Pellegrino Matarazzo", rating:79, potential:87},
+  {id:"bet", name:"Real Betis", short:"BET", strength:79, budget:4, wageBudget:1, balance:22, att:57500, manager:"Manuel Pellegrini", rating:79, potential:86},
+  {id:"sev", name:"Sevilla FC", short:"SEV", strength:78, budget:10, wageBudget:1, balance:45, att:35429, manager:"Matías Almeyda", rating:77, potential:84},
+  {id:"val", name:"Valencia CF", short:"VAL", strength:77, budget:10, wageBudget:1, balance:38, att:42422, manager:"Carlos Corberán", rating:77, potential:84},
+  {id:"gir", name:"Girona FC", short:"GIR", strength:77, budget:13, wageBudget:0.85, balance:22, att:12400, manager:"Míchel", rating:77, potential:86},
+  {id:"cel", name:"Celta de Vigo", short:"CEL", strength:77, budget:4, wageBudget:0.86, balance:45, att:22469, manager:"Claudio Giráldez", rating:77, potential:84},
+  {id:"mal", name:"RCD Mallorca", short:"MAL", strength:77, budget:5, wageBudget:0.61, balance:16, att:19265, manager:"Jagoba Arrasate", rating:77, potential:83},
+  {id:"ray", name:"Rayo Vallecano", short:"RAY", strength:77, budget:3, wageBudget:0.47, balance:34, att:13272, manager:"Iñigo Pérez", rating:77, potential:81},
+  {id:"get", name:"Getafe CF", short:"GET", strength:76, budget:7, wageBudget:0.64, balance:17, att:10900, manager:"José Bordalás", rating:76, potential:82},
+  {id:"osa", name:"Osasuna", short:"OSA", strength:76, budget:6, wageBudget:0.7, balance:19, att:20300, manager:"Alessio Lisci", rating:76, potential:83},
+  {id:"esp", name:"Espanyol", short:"ESP", strength:74, budget:7, wageBudget:0.4, balance:21, att:23750, manager:"Manolo González", rating:74, potential:82},
+  {id:"ala", name:"Deportivo Alavés", short:"ALA", strength:73, budget:5, wageBudget:0.46, balance:24, att:16932, manager:"Eduardo Coudet", rating:73, potential:81},
+  {id:"elc", name:"Elche CF", short:"ELC", strength:72, budget:5, wageBudget:0.45, balance:20, att:19000, manager:"Eder Sarabia", rating:72, potential:83},
+  {id:"lev", name:"Levante UD", short:"LEV", strength:72, budget:4, wageBudget:0.4, balance:9, att:15900, manager:"Luís Castro", rating:72, potential:80},
+  {id:"ovi", name:"Real Oviedo", short:"OVI", strength:72, budget:0.86, wageBudget:0.33, balance:4, att:20600, manager:"Guillermo Almada", rating:72, potential:80}
 ];
 
-const FORMATIONS = {
-  "4-2-3-1": [
-    {x:50,y:88,pos:"GK"},
-    {x:18,y:70,pos:"DEF"},{x:38,y:72,pos:"DEF"},{x:62,y:72,pos:"DEF"},{x:82,y:70,pos:"DEF"},
-    {x:35,y:52,pos:"MID"},{x:65,y:52,pos:"MID"},
-    {x:18,y:35,pos:"MID"},{x:50,y:32,pos:"MID"},{x:82,y:35,pos:"MID"},
-    {x:50,y:14,pos:"ATT"}
+// Jugadores estrella reales (CA aproximado según sortitoutsi / FM26)
+const STAR_PLAYERS = {
+  rm: [
+    {name:"Kylian Mbappé",pos:"ATT",age:26,ca:185,pa:190},{name:"Jude Bellingham",pos:"MID",age:22,ca:175,pa:185},
+    {name:"Vinícius Júnior",pos:"ATT",age:25,ca:178,pa:185},{name:"Federico Valverde",pos:"MID",age:26,ca:165,pa:175},
+    {name:"Thibaut Courtois",pos:"GK",age:33,ca:170,pa:175},{name:"Aurélien Tchouaméni",pos:"MID",age:25,ca:160,pa:170},
+    {name:"Rodrygo",pos:"ATT",age:24,ca:162,pa:175},{name:"Eduardo Camavinga",pos:"MID",age:22,ca:158,pa:175},
+    {name:"Éder Militão",pos:"DEF",age:27,ca:155,pa:165},{name:"Antonio Rüdiger",pos:"DEF",age:32,ca:150,pa:155},
+    {name:"Trent Alexander-Arnold",pos:"DEF",age:26,ca:155,pa:165},{name:"Arda Güler",pos:"MID",age:20,ca:145,pa:175}
   ],
-  "4-3-3": [
-    {x:50,y:88,pos:"GK"},
-    {x:18,y:70,pos:"DEF"},{x:38,y:72,pos:"DEF"},{x:62,y:72,pos:"DEF"},{x:82,y:70,pos:"DEF"},
-    {x:30,y:50,pos:"MID"},{x:50,y:48,pos:"MID"},{x:70,y:50,pos:"MID"},
-    {x:20,y:22,pos:"ATT"},{x:50,y:16,pos:"ATT"},{x:80,y:22,pos:"ATT"}
+  bar: [
+    {name:"Lamine Yamal",pos:"ATT",age:18,ca:175,pa:194},{name:"Pedri",pos:"MID",age:22,ca:177,pa:185},
+    {name:"Raphinha",pos:"ATT",age:28,ca:176,pa:177},{name:"Frenkie de Jong",pos:"MID",age:28,ca:165,pa:180},
+    {name:"Jules Koundé",pos:"DEF",age:26,ca:160,pa:175},{name:"Gavi",pos:"MID",age:20,ca:155,pa:170},
+    {name:"Dani Olmo",pos:"MID",age:27,ca:161,pa:170},{name:"Pau Cubarsí",pos:"DEF",age:18,ca:153,pa:180},
+    {name:"Alejandro Balde",pos:"DEF",age:21,ca:152,pa:170},{name:"Fermín López",pos:"MID",age:22,ca:159,pa:170},
+    {name:"Joan García",pos:"GK",age:24,ca:160,pa:175},{name:"Eric García",pos:"DEF",age:24,ca:155,pa:160}
   ],
-  "4-4-2": [
-    {x:50,y:88,pos:"GK"},
-    {x:18,y:70,pos:"DEF"},{x:38,y:72,pos:"DEF"},{x:62,y:72,pos:"DEF"},{x:82,y:70,pos:"DEF"},
-    {x:18,y:48,pos:"MID"},{x:38,y:50,pos:"MID"},{x:62,y:50,pos:"MID"},{x:82,y:48,pos:"MID"},
-    {x:38,y:18,pos:"ATT"},{x:62,y:18,pos:"ATT"}
-  ],
-  "3-5-2": [
-    {x:50,y:88,pos:"GK"},
-    {x:30,y:72,pos:"DEF"},{x:50,y:74,pos:"DEF"},{x:70,y:72,pos:"DEF"},
-    {x:12,y:48,pos:"MID"},{x:32,y:50,pos:"MID"},{x:50,y:46,pos:"MID"},{x:68,y:50,pos:"MID"},{x:88,y:48,pos:"MID"},
-    {x:38,y:18,pos:"ATT"},{x:62,y:18,pos:"ATT"}
-  ],
-  "4-1-4-1": [
-    {x:50,y:88,pos:"GK"},
-    {x:18,y:70,pos:"DEF"},{x:38,y:72,pos:"DEF"},{x:62,y:72,pos:"DEF"},{x:82,y:70,pos:"DEF"},
-    {x:50,y:58,pos:"MID"},
-    {x:18,y:40,pos:"MID"},{x:38,y:38,pos:"MID"},{x:62,y:38,pos:"MID"},{x:82,y:40,pos:"MID"},
-    {x:50,y:14,pos:"ATT"}
-  ],
-  "5-3-2": [
-    {x:50,y:88,pos:"GK"},
-    {x:12,y:68,pos:"DEF"},{x:30,y:72,pos:"DEF"},{x:50,y:74,pos:"DEF"},{x:70,y:72,pos:"DEF"},{x:88,y:68,pos:"DEF"},
-    {x:30,y:46,pos:"MID"},{x:50,y:44,pos:"MID"},{x:70,y:46,pos:"MID"},
-    {x:38,y:18,pos:"ATT"},{x:62,y:18,pos:"ATT"}
+  atm: [
+    {name:"Julián Álvarez",pos:"ATT",age:25,ca:165,pa:175},{name:"Antoine Griezmann",pos:"ATT",age:34,ca:155,pa:160},
+    {name:"Rodrigo De Paul",pos:"MID",age:31,ca:150,pa:155},{name:"José María Giménez",pos:"DEF",age:30,ca:155,pa:160},
+    {name:"Jan Oblak",pos:"GK",age:32,ca:165,pa:170},{name:"Koke",pos:"MID",age:33,ca:145,pa:148}
   ]
 };
 
-// ==================== GAME STATE ====================
-let state = {
-  userClubId: null,
-  season: "2025/26",
-  matchday: 1,
-  maxMatchdays: 38,
-  budget: 0,
-  morale: 75,
-  formation: "4-2-3-1",
-  mentality: "balanced",
-  style: "gegenpress",
-  pressing: 70,
-  defLine: "standard",
-  tempo: "standard",
-  players: [],
-  teams: {},
-  fixtures: [],
-  results: [],
-  news: [],
-  inbox: [],
-  transferList: [],
-  matchPlayedThisMD: false,
-  trainingApplied: false,
-  selectedClubId: null
+const FIRST_NAMES = ["Luka","Alejandro","Ferran","Rodri","Bruno","Phil","Martin","Federico","Rafael","João","Bernardo","Toni","Joshua","Jamal","Kai","Cole","Declan","Virgil","Ruben","William","Marc","Antonio","Theo","Achraf","Jules","Frenkie","Mason","Marcus","Raheem","Jack","James","Pablo","Hugo","Iñaki","Unai","Mikel","Oihan","Nico","Yeremy","Álex"];
+const LAST_NAMES = ["García","Rodríguez","Martínez","López","González","Pérez","Sánchez","Ramírez","Torres","Flores","Silva","Costa","Santos","Fernandes","Carvalho","Castillo","Vargas","Reyes","Cruz","Molina","Herrera","Jiménez","Ruiz","Alonso","Navarro","Romero","Castro","Ramos","Vega","Méndez","Guerrero","Núñez","Rojas","Medina","Aguilar"];
+
+const FORMATIONS = {
+  "4-2-3-1":[{x:50,y:88,pos:"GK"},{x:18,y:70,pos:"DEF"},{x:38,y:72,pos:"DEF"},{x:62,y:72,pos:"DEF"},{x:82,y:70,pos:"DEF"},{x:35,y:52,pos:"MID"},{x:65,y:52,pos:"MID"},{x:18,y:35,pos:"MID"},{x:50,y:32,pos:"MID"},{x:82,y:35,pos:"MID"},{x:50,y:14,pos:"ATT"}],
+  "4-3-3":[{x:50,y:88,pos:"GK"},{x:18,y:70,pos:"DEF"},{x:38,y:72,pos:"DEF"},{x:62,y:72,pos:"DEF"},{x:82,y:70,pos:"DEF"},{x:30,y:50,pos:"MID"},{x:50,y:48,pos:"MID"},{x:70,y:50,pos:"MID"},{x:20,y:22,pos:"ATT"},{x:50,y:16,pos:"ATT"},{x:80,y:22,pos:"ATT"}],
+  "4-4-2":[{x:50,y:88,pos:"GK"},{x:18,y:70,pos:"DEF"},{x:38,y:72,pos:"DEF"},{x:62,y:72,pos:"DEF"},{x:82,y:70,pos:"DEF"},{x:18,y:48,pos:"MID"},{x:38,y:50,pos:"MID"},{x:62,y:50,pos:"MID"},{x:82,y:48,pos:"MID"},{x:38,y:18,pos:"ATT"},{x:62,y:18,pos:"ATT"}],
+  "3-5-2":[{x:50,y:88,pos:"GK"},{x:30,y:72,pos:"DEF"},{x:50,y:74,pos:"DEF"},{x:70,y:72,pos:"DEF"},{x:12,y:48,pos:"MID"},{x:32,y:50,pos:"MID"},{x:50,y:46,pos:"MID"},{x:68,y:50,pos:"MID"},{x:88,y:48,pos:"MID"},{x:38,y:18,pos:"ATT"},{x:62,y:18,pos:"ATT"}],
+  "4-1-4-1":[{x:50,y:88,pos:"GK"},{x:18,y:70,pos:"DEF"},{x:38,y:72,pos:"DEF"},{x:62,y:72,pos:"DEF"},{x:82,y:70,pos:"DEF"},{x:50,y:58,pos:"MID"},{x:18,y:40,pos:"MID"},{x:38,y:38,pos:"MID"},{x:62,y:38,pos:"MID"},{x:82,y:40,pos:"MID"},{x:50,y:14,pos:"ATT"}],
+  "5-3-2":[{x:50,y:88,pos:"GK"},{x:12,y:68,pos:"DEF"},{x:30,y:72,pos:"DEF"},{x:50,y:74,pos:"DEF"},{x:70,y:72,pos:"DEF"},{x:88,y:68,pos:"DEF"},{x:30,y:46,pos:"MID"},{x:50,y:44,pos:"MID"},{x:70,y:46,pos:"MID"},{x:38,y:18,pos:"ATT"},{x:62,y:18,pos:"ATT"}]
 };
 
-// ==================== UTILITIES ====================
-function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-function uuid() { return Math.random().toString(36).slice(2, 10); }
-function formatMoney(m) {
-  if (m >= 1000) return `€${(m/1000).toFixed(1)}M`;
-  return `€${m}K`;
-}
-function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+let state = {userClubId:null,season:"2025/26",matchday:1,maxMatchdays:38,budget:0,morale:75,formation:"4-2-3-1",mentality:"balanced",style:"gegenpress",pressing:70,defLine:"standard",tempo:"standard",players:[],teams:{},fixtures:[],news:[],inbox:[],transferList:[],matchPlayedThisMD:false,trainingApplied:false,selectedClubId:null};
 
-// ==================== GENERATION ====================
-function generatePlayer(pos, quality = 70) {
-  const age = rand(17, 34);
-  const ca = clamp(quality + rand(-8, 8), 45, 95);
-  const pa = clamp(ca + rand(0, 15), ca, 99);
-  const value = Math.round(Math.pow(ca / 50, 3.2) * (38 - age) * 0.8);
-  const wage = Math.round(value * 0.012 + rand(5, 40));
-  return {
-    id: uuid(),
-    name: `${pick(FIRST_NAMES)} ${pick(LAST_NAMES)}`,
-    pos,
-    age,
-    ca,
-    pa,
-    condition: rand(85, 100),
-    morale: rand(60, 90),
-    value,
-    wage,
-    injured: Math.random() < 0.04,
-    form: rand(5, 9)
-  };
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function uuid(){return Math.random().toString(36).slice(2,10)}
+function formatMoney(m){if(m>=1000)return`€${(m/1000).toFixed(1)}M`;return`€${Math.round(m)}K`}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+
+function generatePlayer(pos,quality=70,name=null){
+  const age=rand(17,34);
+  const ca=clamp(quality+rand(-8,8),45,95);
+  const pa=clamp(ca+rand(0,15),ca,99);
+  const value=Math.round(Math.pow(ca/50,3.2)*(38-age)*0.8);
+  return{id:uuid(),name:name||`${pick(FIRST_NAMES)} ${pick(LAST_NAMES)}`,pos,age,ca,pa,condition:rand(85,100),morale:rand(60,90),value,wage:Math.round(value*0.012+rand(5,40)),injured:Math.random()<0.04,form:rand(5,9)};
 }
 
-function generateSquad(strength) {
-  const squad = [];
-  squad.push(generatePlayer("GK", strength - 5));
-  squad.push(generatePlayer("GK", strength - 18));
-  for (let i = 0; i < 8; i++) squad.push(generatePlayer("DEF", strength - rand(0, 15)));
-  for (let i = 0; i < 8; i++) squad.push(generatePlayer("MID", strength - rand(0, 14)));
-  for (let i = 0; i < 6; i++) squad.push(generatePlayer("ATT", strength - rand(0, 12)));
-  return squad.sort((a,b) => b.ca - a.ca);
+function generateSquad(clubId,strength){
+  const squad=[];
+  const stars=STAR_PLAYERS[clubId]||[];
+  stars.forEach(s=>{
+    const p=generatePlayer(s.pos,s.ca/2,s.name); // scale CA ~ half for our 45-95 range
+    p.ca=clamp(Math.round(s.ca/2.1),55,95);
+    p.pa=clamp(Math.round(s.pa/2.1),p.ca,99);
+    p.age=s.age;
+    p.value=Math.round(Math.pow(p.ca/50,3.2)*(38-p.age)*1.2);
+    squad.push(p);
+  });
+  const needed={GK:2,DEF:8,MID:8,ATT:6};
+  stars.forEach(s=>needed[s.pos]=Math.max(0,(needed[s.pos]||0)-1));
+  Object.entries(needed).forEach(([pos,n])=>{
+    for(let i=0;i<n;i++)squad.push(generatePlayer(pos,strength-rand(0,15)));
+  });
+  return squad.sort((a,b)=>b.ca-a.ca);
 }
 
-function initTeams() {
-  CLUBS.forEach(c => {
-    state.teams[c.id] = {
-      ...c,
-      players: generateSquad(c.strength),
-      played: 0, won: 0, drawn: 0, lost: 0,
-      gf: 0, ga: 0, pts: 0,
-      form: []
-    };
+function initTeams(){
+  CLUBS.forEach(c=>{
+    state.teams[c.id]={...c,players:generateSquad(c.id,c.strength),played:0,won:0,drawn:0,lost:0,gf:0,ga:0,pts:0,form:[]};
   });
 }
 
-function generateFixtures() {
-  const ids = CLUBS.map(c => c.id);
-  const fixtures = [];
-  for (let md = 1; md <= 38; md++) {
-    const round = [];
-    const shuffled = [...ids].sort(() => Math.random() - 0.5);
-    for (let i = 0; i < shuffled.length; i += 2) {
-      if (shuffled[i+1]) {
-        round.push({ home: shuffled[i], away: shuffled[i+1], md });
-      }
-    }
-    fixtures.push(round);
-  }
-  state.fixtures = fixtures;
-}
-
-function generateTransferList() {
-  const list = [];
-  const positions = ["GK","DEF","MID","ATT"];
-  for (let i = 0; i < 25; i++) {
-    const pos = pick(positions);
-    const ca = rand(68, 88);
-    list.push({
-      ...generatePlayer(pos, ca),
-      club: pick(["Ajax","Benfica","Porto","Dortmund","Leverkusen","Napoli","Milan","Lazio","Brighton","Atalanta","Lille","Monaco","Sporting","Feyenoord","RB Leipzig"])
-    });
-  }
-  state.transferList = list.sort((a,b) => b.ca - a.ca);
-}
-
-// ==================== MATCH ENGINE ====================
-function calcTeamStrength(teamId, isUser = false) {
-  const team = state.teams[teamId];
-  const players = team.players.filter(p => !p.injured).slice(0, 11);
-  if (players.length < 11) return team.strength * 0.7;
-  let avg = players.reduce((s,p) => s + p.ca * (p.condition/100) * (p.form/7), 0) / 11;
-  if (isUser) {
-    const mentMod = { defensive: -3, cautious: -1.5, balanced: 0, positive: 1.5, attacking: 3 }[state.mentality] || 0;
-    const styleMod = { possession: 1, counter: 0.5, direct: 0, gegenpress: 2, tiki: 1.5 }[state.style] || 0;
-    const pressMod = (state.pressing - 50) / 25;
-    avg += mentMod + styleMod + pressMod;
-  }
-  return clamp(avg, 40, 99);
-}
-
-function simulateMatch(homeId, awayId) {
-  const homeStr = calcTeamStrength(homeId, homeId === state.userClubId);
-  const awayStr = calcTeamStrength(awayId, awayId === state.userClubId);
-  const homeAdv = 4;
-  const hExp = Math.pow(homeStr + homeAdv, 1.35) / 18;
-  const aExp = Math.pow(awayStr, 1.35) / 18;
-
-  let hg = 0, ag = 0;
-  for (let i = 0; i < 6; i++) {
-    if (Math.random() < hExp / 6) hg++;
-    if (Math.random() < aExp / 6) ag++;
-  }
-  if (Math.random() < 0.15) hg += rand(0,1);
-  if (Math.random() < 0.15) ag += rand(0,1);
-
-  const events = [];
-  const homeName = state.teams[homeId].name;
-  const awayName = state.teams[awayId].name;
-  const homePlayers = state.teams[homeId].players.filter(p => !p.injured);
-  const awayPlayers = state.teams[awayId].players.filter(p => !p.injured);
-
-  const totalGoals = hg + ag;
-  const minutes = [];
-  for (let i = 0; i < totalGoals; i++) minutes.push(rand(3, 92));
-  minutes.sort((a,b)=>a-b);
-
-  let hScored = 0, aScored = 0;
-  minutes.forEach(min => {
-    if (hScored < hg && (aScored >= ag || Math.random() < 0.55)) {
-      const scorer = pick(homePlayers.filter(p => p.pos === "ATT" || p.pos === "MID") || homePlayers);
-      events.push({ min, type: "goal", text: `⚽ GOL! ${scorer.name} (${homeName})`, team: "home" });
-      hScored++;
-    } else if (aScored < ag) {
-      const scorer = pick(awayPlayers.filter(p => p.pos === "ATT" || p.pos === "MID") || awayPlayers);
-      events.push({ min, type: "goal", text: `⚽ GOL! ${scorer.name} (${awayName})`, team: "away" });
-      aScored++;
-    }
-  });
-
-  for (let i = 0; i < rand(1,4); i++) {
-    const min = rand(10, 90);
-    const team = Math.random() < 0.5 ? homeName : awayName;
-    const players = team === homeName ? homePlayers : awayPlayers;
-    const p = pick(players);
-    if (Math.random() < 0.85) {
-      events.push({ min, type: "card-y", text: `🟨 Tarjeta amarilla para ${p.name} (${team})` });
-    } else {
-      events.push({ min, type: "card-r", text: `🟥 ¡Tarjeta roja! ${p.name} (${team})` });
-    }
-  }
-  events.sort((a,b) => a.min - b.min);
-
-  return { homeGoals: hg, awayGoals: ag, events, homeStr, awayStr };
-}
-
-function applyResult(homeId, awayId, hg, ag) {
-  const home = state.teams[homeId];
-  const away = state.teams[awayId];
-  home.played++; away.played++;
-  home.gf += hg; home.ga += ag;
-  away.gf += ag; away.ga += hg;
-  if (hg > ag) {
-    home.won++; home.pts += 3; home.form.unshift("W"); away.lost++; away.form.unshift("L");
-  } else if (hg < ag) {
-    away.won++; away.pts += 3; away.form.unshift("W"); home.lost++; home.form.unshift("L");
-  } else {
-    home.drawn++; away.drawn++; home.pts++; away.pts++;
-    home.form.unshift("D"); away.form.unshift("D");
-  }
-  home.form = home.form.slice(0,5);
-  away.form = away.form.slice(0,5);
-
-  if (homeId === state.userClubId || awayId === state.userClubId) {
-    const userWon = (homeId === state.userClubId && hg > ag) || (awayId === state.userClubId && ag > hg);
-    const userDrew = hg === ag;
-    if (userWon) state.morale = clamp(state.morale + rand(3,8), 20, 100);
-    else if (userDrew) state.morale = clamp(state.morale + rand(-2,3), 20, 100);
-    else state.morale = clamp(state.morale - rand(4,10), 20, 100);
-  }
-}
-
-// ==================== RENDER ====================
-function updateHeader() {
-  const club = state.teams[state.userClubId];
-  document.getElementById("hdr-club").textContent = club.name;
-  document.getElementById("hdr-manager").textContent = club.manager;
-  document.getElementById("hdr-season").textContent = state.season;
-  document.getElementById("hdr-matchday").textContent = state.matchday;
-  document.getElementById("hdr-budget").textContent = formatMoney(state.budget * 1000);
-  document.getElementById("hdr-morale").textContent = state.morale + "%";
-}
-
-function renderDashboard() {
-  const club = state.teams[state.userClubId];
-  const sorted = Object.values(state.teams).sort((a,b) => b.pts - a.pts || (b.gf-b.ga) - (a.gf-a.ga));
-  const pos = sorted.findIndex(t => t.id === state.userClubId) + 1;
-  document.getElementById("dash-pos").textContent = pos + "º";
-  document.getElementById("dash-pts").textContent = club.pts;
-  document.getElementById("dash-form").innerHTML = club.form.map(f => `<span class="${f}">${f}</span>`).join("") || "—";
-  document.getElementById("dash-manager").textContent = club.manager;
-
-  const mdFixtures = state.fixtures[state.matchday - 1] || [];
-  const next = mdFixtures.find(f => f.home === state.userClubId || f.away === state.userClubId);
-  const nextEl = document.getElementById("next-match");
-  if (next && !state.matchPlayedThisMD) {
-    const isHome = next.home === state.userClubId;
-    const opp = state.teams[isHome ? next.away : next.home];
-    nextEl.innerHTML = `
-      <div style="font-size:1.05rem;font-weight:700;">${isHome ? "Local vs" : "Visitante vs"} ${opp.name}</div>
-      <div style="color:var(--muted);margin-top:4px;">Jornada ${state.matchday} · Entrenador rival: ${opp.manager} · Fuerza: ${opp.strength}</div>
-    `;
-  } else if (state.matchday > state.maxMatchdays) {
-    nextEl.innerHTML = `<div style="font-weight:700;">¡Temporada finalizada!</div>`;
-  } else {
-    nextEl.innerHTML = `<div>Partido de esta jornada ya jugado. Continúa a la siguiente.</div>`;
-  }
-
-  const feed = document.getElementById("news-feed");
-  feed.innerHTML = state.news.slice(0, 6).map(n => `
-    <div class="news-item">
-      <div class="date">${n.date}</div>
-      <div>${n.text}</div>
-    </div>
-  `).join("") || "<div style='color:var(--muted)'>Sin noticias recientes.</div>";
-}
-
-function renderSquad() {
-  const filter = document.getElementById("squad-filter").value;
-  let list = state.players;
-  if (filter !== "all") list = list.filter(p => p.pos === filter);
-  list = [...list].sort((a,b) => b.ca - a.ca);
-  document.getElementById("squad-table").innerHTML = list.map(p => `
-    <tr>
-      <td class="pos ${p.pos}">${p.pos}</td>
-      <td>${p.name}</td>
-      <td>${p.age}</td>
-      <td class="rating">${p.ca}</td>
-      <td class="stat">${p.pa}</td>
-      <td class="stat">${p.condition}%</td>
-      <td class="stat">${p.morale}%</td>
-      <td>${formatMoney(p.value)}</td>
-      <td>${formatMoney(p.wage)}/sem</td>
-      <td>${p.injured ? '<span class="injury">Lesionado</span>' : '<span class="badge">Disponible</span>'}</td>
-    </tr>
-  `).join("");
-}
-
-function renderPitch() {
-  const pitch = document.getElementById("pitch");
-  const slots = FORMATIONS[state.formation] || FORMATIONS["4-2-3-1"];
-  const available = state.players.filter(p => !p.injured).sort((a,b) => b.ca - a.ca);
-  const used = new Set();
-  pitch.innerHTML = slots.map((slot) => {
-    let player = available.find(p => p.pos === slot.pos && !used.has(p.id));
-    if (!player) player = available.find(p => !used.has(p.id));
-    if (player) used.add(player.id);
-    const name = player ? player.name.split(" ").pop() : "—";
-    const num = player ? player.ca : "–";
-    return `<div class="player-token" style="left:${slot.x}%;top:${slot.y}%;" title="${player ? player.name : 'Vacío'}">
-      <span class="num">${num}</span>
-      <span class="name">${name}</span>
-    </div>`;
-  }).join("");
-}
-
-function renderStandings() {
-  const sorted = Object.values(state.teams).sort((a,b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf);
-  document.getElementById("standings-body").innerHTML = sorted.map((t, i) => `
-    <tr class="${t.id === state.userClubId ? 'you' : ''}">
-      <td>${i+1}</td>
-      <td>${t.name}${t.id === state.userClubId ? ' ★' : ''}</td>
-      <td style="font-size:0.8rem;color:var(--muted);">${t.manager}</td>
-      <td>${t.played}</td>
-      <td>${t.won}</td>
-      <td>${t.drawn}</td>
-      <td>${t.lost}</td>
-      <td>${t.gf}</td>
-      <td>${t.ga}</td>
-      <td>${t.gf - t.ga > 0 ? '+' : ''}${t.gf - t.ga}</td>
-      <td><strong>${t.pts}</strong></td>
-      <td class="form">${t.form.map(f => `<span class="${f}">${f}</span>`).join("")}</td>
-    </tr>
-  `).join("");
-}
-
-function renderTransfers() {
-  document.getElementById("transfer-budget").textContent = formatMoney(state.budget * 1000);
-  document.getElementById("transfer-table").innerHTML = state.transferList.map(p => `
-    <tr>
-      <td class="pos ${p.pos}">${p.pos}</td>
-      <td>${p.name}</td>
-      <td>${p.age}</td>
-      <td class="rating">${p.ca}</td>
-      <td>${p.club}</td>
-      <td>${formatMoney(p.value)}</td>
-      <td>${formatMoney(p.wage)}/sem</td>
-      <td><button class="btn" style="padding:5px 10px;font-size:0.8rem;" onclick="buyPlayer('${p.id}')">Fichar</button></td>
-    </tr>
-  `).join("");
-}
-
-function renderInbox() {
-  document.getElementById("inbox-list").innerHTML = state.inbox.map(m => `
-    <div class="news-item">
-      <div class="date">${m.date} · ${m.from}</div>
-      <div style="font-weight:600;margin:4px 0;">${m.subject}</div>
-      <div style="color:var(--muted);">${m.body}</div>
-    </div>
-  `).join("") || "<div style='color:var(--muted)'>Bandeja vacía.</div>";
-}
-
-function addNews(text) {
-  state.news.unshift({ date: `J${state.matchday}`, text });
-  state.news = state.news.slice(0, 30);
-}
-
-function addInbox(from, subject, body) {
-  state.inbox.unshift({ date: `Jornada ${state.matchday}`, from, subject, body });
-}
-
-// ==================== ACTIONS ====================
-function playUserMatch() {
-  if (state.matchPlayedThisMD) return;
-  const mdFixtures = state.fixtures[state.matchday - 1];
-  if (!mdFixtures) return;
-  const fixture = mdFixtures.find(f => f.home === state.userClubId || f.away === state.userClubId);
-  if (!fixture) return;
-
-  mdFixtures.forEach(f => {
-    if (f.home === state.userClubId || f.away === state.userClubId) return;
-    const res = simulateMatch(f.home, f.away);
-    applyResult(f.home, f.away, res.homeGoals, res.awayGoals);
-  });
-
-  const result = simulateMatch(fixture.home, fixture.away);
-  applyResult(fixture.home, fixture.away, result.homeGoals, result.awayGoals);
-  state.matchPlayedThisMD = true;
-
-  document.getElementById("match-home").textContent = state.teams[fixture.home].name;
-  document.getElementById("match-away").textContent = state.teams[fixture.away].name;
-  document.getElementById("match-score").textContent = `${result.homeGoals} - ${result.awayGoals}`;
-  document.getElementById("match-status").textContent = "Partido finalizado";
-  document.getElementById("match-events").innerHTML = result.events.map(e => `
-    <div class="event ${e.type}">
-      <span class="min">${e.min}'</span>
-      <span>${e.text}</span>
-    </div>
-  `).join("") || "<div style='color:var(--muted)'>Partido sin eventos destacados.</div>";
-
-  document.getElementById("btn-sim-match").style.display = "none";
-  document.getElementById("btn-next-matchday").style.display = "inline-block";
-
-  const userIsHome = fixture.home === state.userClubId;
-  const userGoals = userIsHome ? result.homeGoals : result.awayGoals;
-  const oppGoals = userIsHome ? result.awayGoals : result.homeGoals;
-  const oppName = state.teams[userIsHome ? fixture.away : fixture.home].name;
-  if (userGoals > oppGoals) addNews(`¡Victoria! ${state.teams[state.userClubId].name} ${userGoals}-${oppGoals} ${oppName}`);
-  else if (userGoals < oppGoals) addNews(`Derrota ${userGoals}-${oppGoals} ante ${oppName}`);
-  else addNews(`Empate ${userGoals}-${oppGoals} contra ${oppName}`);
-
-  if (Math.random() < 0.4) {
-    addInbox("Director Deportivo", "Análisis post-partido", "Buen esfuerzo del equipo. Debemos mejorar la transición defensiva.");
-  }
-
-  showScreen("match");
-  updateHeader();
-}
-
-function nextMatchday() {
-  if (state.matchday >= state.maxMatchdays) {
-    addNews("¡Fin de la temporada! Consulta la clasificación final.");
-    updateAll();
-    return;
-  }
-  state.matchday++;
-  state.matchPlayedThisMD = false;
-  state.trainingApplied = false;
-  state.players.forEach(p => {
-    if (!p.injured) p.condition = clamp(p.condition + rand(5, 15), 50, 100);
-    if (p.injured && Math.random() < 0.35) p.injured = false;
-    p.morale = clamp(p.morale + rand(-3, 5), 30, 100);
-  });
-  document.getElementById("btn-sim-match").style.display = "inline-block";
-  document.getElementById("btn-next-matchday").style.display = "none";
-  document.getElementById("match-score").textContent = "0 - 0";
-  document.getElementById("match-events").innerHTML = "";
-  document.getElementById("match-status").textContent = "Listo para comenzar";
-  addNews(`Comienza la jornada ${state.matchday}`);
-  updateAll();
-  showScreen("dashboard");
-}
-
-function buyPlayer(id) {
-  const idx = state.transferList.findIndex(p => p.id === id);
-  if (idx === -1) return;
-  const p = state.transferList[idx];
-  const cost = p.value;
-  if (state.budget * 1000 < cost) {
-    alert("Presupuesto insuficiente.");
-    return;
-  }
-  if (!confirm(`¿Fichar a ${p.name} por ${formatMoney(cost)}?`)) return;
-  state.budget -= cost / 1000;
-  state.players.push({ ...p, club: undefined });
-  state.teams[state.userClubId].players = state.players;
-  state.transferList.splice(idx, 1);
-  addNews(`Fichaje: ${p.name} llega al club por ${formatMoney(cost)}`);
-  addInbox("Secretaría Técnica", "Fichaje cerrado", `${p.name} ha firmado y ya está disponible en la plantilla.`);
-  updateAll();
-}
-
-function applyTraining() {
-  if (state.trainingApplied) {
-    alert("Ya has aplicado el entrenamiento esta semana.");
-    return;
-  }
-  const intensity = document.getElementById("train-intensity").value;
-  const focus = document.getElementById("train-focus").value;
-  const mods = {
-    recovery: { cond: 12, morale: 3, risk: 0.01 },
-    light: { cond: 6, morale: 2, risk: 0.02 },
-    medium: { cond: 0, morale: 0, risk: 0.04 },
-    high: { cond: -6, morale: -2, risk: 0.08 },
-    double: { cond: -12, morale: -4, risk: 0.14 }
-  }[intensity];
-  state.players.forEach(p => {
-    if (p.injured) return;
-    p.condition = clamp(p.condition + mods.cond + rand(-3,3), 40, 100);
-    p.morale = clamp(p.morale + mods.morale + rand(-2,2), 25, 100);
-    if (Math.random() < mods.risk) p.injured = true;
-    if (p.age < 24 && focus !== "recovery" && Math.random() < 0.15) {
-      p.ca = clamp(p.ca + 1, 45, p.pa);
-    }
-  });
-  state.trainingApplied = true;
-  document.getElementById("train-status").textContent = `Aplicado: ${intensity} / ${focus}`;
-  addNews(`Sesión de entrenamiento (${intensity}) completada.`);
-  updateAll();
-}
-
-// ==================== UI ====================
-function showScreen(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  document.querySelectorAll("nav button").forEach(b => {
-    b.classList.toggle("active", b.dataset.screen === id);
-  });
-  if (id === "squad") renderSquad();
-  if (id === "tactics") renderPitch();
-  if (id === "league") renderStandings();
-  if (id === "transfers") renderTransfers();
-  if (id === "inbox") renderInbox();
-  if (id === "dashboard") renderDashboard();
-}
-
-function updateAll() {
-  updateHeader();
-  renderDashboard();
-  renderSquad();
-  renderPitch();
-  renderStandings();
-  renderTransfers();
-  renderInbox();
-}
-
-// ==================== START / NEW GAME ====================
-function renderClubSelect() {
-  const grid = document.getElementById("club-select-grid");
-  grid.innerHTML = CLUBS.map(c => `
-    <div class="club-card" data-id="${c.id}">
-      <div class="cname">${c.name}</div>
-      <div class="cmanager">👔 ${c.manager}</div>
-      <div class="cstats">Fuerza: <strong>${c.strength}</strong> · Presupuesto: <strong>${formatMoney(c.budget * 1000)}</strong></div>
-    </div>
-  `).join("");
-
-  grid.querySelectorAll(".club-card").forEach(card => {
-    card.addEventListener("click", () => {
-      grid.querySelectorAll(".club-card").forEach(c => c.classList.remove("selected"));
-      card.classList.add("selected");
-      state.selectedClubId = card.dataset.id;
-      document.getElementById("btn-start-game").disabled = false;
-    });
-  });
-}
-
-function startNewGame() {
-  if (!state.selectedClubId) return;
-  state.userClubId = state.selectedClubId;
-  state.matchday = 1;
-  state.morale = 75;
-  state.formation = "4-2-3-1";
-  state.mentality = "balanced";
-  state.style = "gegenpress";
-  state.pressing = 70;
-  state.defLine = "standard";
-  state.tempo = "standard";
-  state.news = [];
-  state.inbox = [];
-  state.matchPlayedThisMD = false;
-  state.trainingApplied = false;
-
-  initTeams();
-  state.players = state.teams[state.userClubId].players;
-  state.budget = state.teams[state.userClubId].budget;
-  generateFixtures();
-  generateTransferList();
-
-  const club = state.teams[state.userClubId];
-  addNews(`Bienvenido a la temporada 2025/26. Diriges al ${club.name} bajo el mando de ${club.manager}. ¡Suerte!`);
-  addInbox("Presidencia", "Objetivos de la temporada", `Queremos clasificarnos para competición europea. Presupuesto de fichajes: ${formatMoney(state.budget * 1000)}. ¡Éxito, entrenador!`);
-
-  document.getElementById("start-screen").classList.add("hidden");
-  document.getElementById("game-ui").classList.add("visible");
-  updateAll();
-  showScreen("dashboard");
-}
-
-function resetToStartScreen() {
-  if (!confirm("¿Seguro que quieres empezar una nueva partida? Se perderá el progreso actual.")) return;
-  state.selectedClubId = null;
-  document.getElementById("btn-start-game").disabled = true;
-  document.getElementById("game-ui").classList.remove("visible");
-  document.getElementById("start-screen").classList.remove("hidden");
-  renderClubSelect();
-}
-
-// ==================== EVENTS ====================
-document.querySelectorAll("nav button").forEach(btn => {
-  btn.addEventListener("click", () => showScreen(btn.dataset.screen));
-});
-
-document.getElementById("btn-continue").addEventListener("click", () => {
-  if (state.matchPlayedThisMD) nextMatchday();
-  else {
-    showScreen("match");
-    const mdFixtures = state.fixtures[state.matchday - 1] || [];
-    const fixture = mdFixtures.find(f => f.home === state.userClubId || f.away === state.userClubId);
-    if (fixture) {
-      document.getElementById("match-home").textContent = state.teams[fixture.home].name;
-      document.getElementById("match-away").textContent = state.teams[fixture.away].name;
-      document.getElementById("match-score").textContent = "0 - 0";
-      document.getElementById("match-events").innerHTML = "";
-      document.getElementById("match-status").textContent = "Listo para comenzar";
-      document.getElementById("btn-sim-match").style.display = "inline-block";
-      document.getElementById("btn-next-matchday").style.display = "none";
-    }
-  }
-});
-
-document.getElementById("btn-sim-match").addEventListener("click", playUserMatch);
-document.getElementById("btn-next-matchday").addEventListener("click", nextMatchday);
-document.getElementById("squad-filter").addEventListener("change", renderSquad);
-document.getElementById("formation-select").addEventListener("change", e => {
-  state.formation = e.target.value;
-  renderPitch();
-});
-document.getElementById("pressing").addEventListener("input", e => {
-  state.pressing = +e.target.value;
-  document.getElementById("press-bar").style.width = state.pressing + "%";
-});
-document.getElementById("btn-save-tactics").addEventListener("click", () => {
-  state.mentality = document.getElementById("mentality").value;
-  state.style = document.getElementById("style").value;
-  state.defLine = document.getElementById("def-line").value;
-  state.tempo = document.getElementById("tempo").value;
-  document.getElementById("tactics-feedback").textContent = "✓ Táctica guardada correctamente";
-  setTimeout(() => document.getElementById("tactics-feedback").textContent = "", 2500);
-});
-document.getElementById("btn-apply-training").addEventListener("click", applyTraining);
-document.getElementById("btn-start-game").addEventListener("click", startNewGame);
-document.getElementById("btn-new-game").addEventListener("click", resetToStartScreen);
-
-// Init: mostrar selector de club
-renderClubSelect();
-</script>
-</body>
-</html>
+function generateFixtures(){
+  const ids=CLUBS.map(c
