@@ -22,7 +22,10 @@ h2{font-size:1.25rem;margin-bottom:14px;color:var(--accent);display:flex;align-i
 h3{font-size:1rem;margin-bottom:10px;color:var(--text)}
 table{width:100%;border-collapse:collapse;font-size:.88rem}
 th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--border)}
-th{color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.4px}
+th{color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.4px;cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--accent)}
+th.sorted{color:var(--accent)}
+th .arrow{font-size:.7rem;margin-left:3px;opacity:.85}
 tr:hover td{background:rgba(255,255,255,.03)}
 .pos{font-weight:700;width:36px}.pos.GK{color:#f39c12}.pos.DEF{color:#3498db}.pos.MID{color:#2ecc71}.pos.ATT{color:#e74c3c}
 .stat{font-variant-numeric:tabular-nums}.rating{font-weight:700;color:var(--accent)}
@@ -177,7 +180,21 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:.8rem}
         </select>
       </div>
       <table>
-        <thead><tr><th>Pos</th><th>Nombre</th><th>Edad</th><th>CA</th><th>PA</th><th>Cond</th><th>Moral</th><th>Valor</th><th>Sueldo</th><th>Estado</th><th></th></tr></thead>
+        <thead>
+          <tr>
+            <th data-sort="pos">Pos <span class="arrow"></span></th>
+            <th data-sort="name">Nombre <span class="arrow"></span></th>
+            <th data-sort="age">Edad <span class="arrow"></span></th>
+            <th data-sort="ca">CA <span class="arrow"></span></th>
+            <th data-sort="pa">PA <span class="arrow"></span></th>
+            <th data-sort="condition">Cond <span class="arrow"></span></th>
+            <th data-sort="morale">Moral <span class="arrow"></span></th>
+            <th data-sort="value">Valor <span class="arrow"></span></th>
+            <th data-sort="wage">Sueldo <span class="arrow"></span></th>
+            <th data-sort="status">Estado <span class="arrow"></span></th>
+            <th></th>
+          </tr>
+        </thead>
         <tbody id="squad-table"></tbody>
       </table>
     </div>
@@ -329,7 +346,6 @@ const CLUBS = [
   {id:"ovi", name:"Real Oviedo", short:"OVI", strength:72, budget:1, wageBudget:0.4, balance:9, att:20600, manager:"Guillermo Almada", rating:72, potential:80}
 ];
 
-// Jugadores estrella actualizados con valores de mercado Transfermarkt aproximados (CA escalado 45-95)
 const STAR_PLAYERS = {
   rm: [
     {name:"Kylian Mbappé",pos:"ATT",age:27,ca:190,pa:192,mv:180},
@@ -404,13 +420,18 @@ const FORMATIONS = {
 
 const COPA_ROUNDS = ["Dieciseisavos","Octavos","Cuartos","Semifinales","Final"];
 
+// Orden de posiciones para ordenar por POS
+const POS_ORDER = {GK:1, DEF:2, MID:3, ATT:4};
+
 let state = {
   userClubId:null,season:"2025/26",matchday:1,maxMatchdays:38,budget:0,morale:75,
   formation:"4-2-3-1",mentality:"balanced",style:"gegenpress",pressing:70,defLine:"standard",tempo:"standard",
   players:[],teams:{},fixtures:[],news:[],inbox:[],transferList:[],
   matchPlayedThisMD:false,trainingApplied:false,selectedClubId:null,
-  // Copa del Rey
-  copaRound:0,copaAlive:true,copaBracket:[],copaUserMatch:null,copaPlayedThisRound:false
+  copaRound:0,copaAlive:true,copaBracket:[],copaUserMatch:null,copaPlayedThisRound:false,
+  // Ordenación de plantilla
+  squadSortBy: "ca",
+  squadSortDir: "desc"
 };
 
 function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
@@ -474,18 +495,14 @@ function generateTransferList(){
 }
 
 function initCopa(){
-  // Los 20 de La Liga + algunos "equipos menores" generados para rellenar
   const ligaIds=CLUBS.map(c=>c.id);
-  // Para simplificar: empezamos en dieciseisavos con los 20 de La Liga + 12 "modestos"
   const modestos=["Racing Santander","Sporting Gijón","Albacete","Burgos","Eibar","Huesca","Leganés","Zaragoza","Tenerife","Cartagena","Mirandés","Eldense"];
   const all=[...ligaIds];
-  // Añadir modestos como "equipos virtuales"
   modestos.forEach((n,i)=>{
     const id="mod"+i;
     state.teams[id]={id,name:n,short:n.slice(0,3).toUpperCase(),strength:rand(55,68),manager:"—",players:[],played:0,won:0,drawn:0,lost:0,gf:0,ga:0,pts:0,form:[],rating:rand(60,70)};
     all.push(id);
   });
-  // Mezclar y emparejar para dieciseisavos (32 equipos)
   const shuffled=all.sort(()=>Math.random()-0.5).slice(0,32);
   const bracket=[];
   for(let i=0;i<shuffled.length;i+=2){
@@ -529,7 +546,6 @@ function simulateMatch(homeId, awayId) {
   }
   var hg = goalsFromExp(hExp);
   var ag = goalsFromExp(aExp);
-  // En copa, si empate, penaltis (simplificado: 50/50 o fuerza)
   var events = [];
   var homeName = state.teams[homeId]?state.teams[homeId].name:homeId;
   var awayName = state.teams[awayId]?state.teams[awayId].name:awayId;
@@ -607,7 +623,6 @@ function renderDashboard(){
   }else if(state.matchday>state.maxMatchdays)el.innerHTML=`<div style="font-weight:700">¡Temporada de liga finalizada!</div>`;
   else el.innerHTML=`<div>Partido de liga ya jugado. Continúa a la siguiente jornada.</div>`;
 
-  // Copa
   const copaEl=document.getElementById("next-copa");
   if(!state.copaAlive){
     copaEl.innerHTML=`<div style="font-weight:700;color:var(--loss)">Eliminado de la Copa del Rey</div>`;
@@ -625,10 +640,68 @@ function renderDashboard(){
   document.getElementById("news-feed").innerHTML=state.news.slice(0,6).map(n=>`<div class="news-item"><div class="date">${n.date}</div><div>${n.text}</div></div>`).join("")||"<div style='color:var(--muted)'>Sin noticias.</div>";
 }
 
+function sortSquadList(list){
+  const by = state.squadSortBy;
+  const dir = state.squadSortDir === "asc" ? 1 : -1;
+
+  return [...list].sort((a,b)=>{
+    let va, vb;
+    switch(by){
+      case "pos":
+        va = POS_ORDER[a.pos] || 99;
+        vb = POS_ORDER[b.pos] || 99;
+        break;
+      case "name":
+        va = a.name.toLowerCase();
+        vb = b.name.toLowerCase();
+        return dir * va.localeCompare(vb);
+      case "age":
+        va = a.age; vb = b.age; break;
+      case "ca":
+        va = a.ca; vb = b.ca; break;
+      case "pa":
+        va = a.pa; vb = b.pa; break;
+      case "condition":
+        va = a.condition; vb = b.condition; break;
+      case "morale":
+        va = a.morale; vb = b.morale; break;
+      case "value":
+        va = a.value; vb = b.value; break;
+      case "wage":
+        va = a.wage; vb = b.wage; break;
+      case "status":
+        va = a.injured ? 1 : 0;
+        vb = b.injured ? 1 : 0;
+        break;
+      default:
+        va = a.ca; vb = b.ca;
+    }
+    if(va < vb) return -1 * dir;
+    if(va > vb) return 1 * dir;
+    // desempate por CA descendente
+    return b.ca - a.ca;
+  });
+}
+
+function updateSortHeaders(){
+  document.querySelectorAll("#squad thead th[data-sort]").forEach(th=>{
+    const key = th.dataset.sort;
+    const arrow = th.querySelector(".arrow");
+    th.classList.toggle("sorted", key === state.squadSortBy);
+    if(key === state.squadSortBy){
+      arrow.textContent = state.squadSortDir === "asc" ? "▲" : "▼";
+    } else {
+      arrow.textContent = "";
+    }
+  });
+}
+
 function renderSquad(){
   const filter=document.getElementById("squad-filter").value;
   let list=filter==="all"?state.players:state.players.filter(p=>p.pos===filter);
-  list=[...list].sort((a,b)=>b.ca-a.ca);
+  list = sortSquadList(list);
+  updateSortHeaders();
+
   document.getElementById("squad-table").innerHTML=list.map(p=>`<tr>
     <td class="pos ${p.pos}">${p.pos}</td><td>${p.name}</td><td>${p.age}</td>
     <td class="rating">${p.ca}</td><td class="stat">${p.pa}</td>
@@ -723,11 +796,10 @@ function playCopaMatch(){
   m.hg=result.homeGoals;m.ag=result.awayGoals;m.played=true;
   state.copaPlayedThisRound=true;
 
-  // Determinar ganador (si empate → penaltis simplificados)
   let winner;
   if(result.homeGoals>result.awayGoals)winner=m.home;
   else if(result.awayGoals>result.homeGoals)winner=m.away;
-  else winner=Math.random()<0.5?m.home:m.away; // penaltis
+  else winner=Math.random()<0.5?m.home:m.away;
 
   const isUserWin=winner===state.userClubId;
   if(!isUserWin){
@@ -737,17 +809,11 @@ function playCopaMatch(){
     addNews(`¡Clasificado en Copa del Rey! (${COPA_ROUNDS[state.copaRound]})`);
   }
 
-  // Simular resto de la ronda
   state.copaBracket.forEach(match=>{
     if(match.played)return;
     const r=simulateMatch(match.home,match.away);
     match.hg=r.homeGoals;match.ag=r.awayGoals;match.played=true;
   });
-
-  // Preparar siguiente ronda si el usuario avanza
-  if(isUserWin&&state.copaRound<COPA_ROUNDS.length-1){
-    // Se generará en nextMatchday cuando toque
-  }
 
   showScreen("copa");
   renderCopa();
@@ -757,7 +823,6 @@ function playCopaMatch(){
 
 function advanceCopaRound(){
   if(!state.copaAlive||state.copaRound>=COPA_ROUNDS.length-1)return;
-  // Extraer ganadores
   const winners=[];
   state.copaBracket.forEach(m=>{
     if(m.hg>m.ag)winners.push(m.home);
@@ -765,7 +830,6 @@ function advanceCopaRound(){
     else winners.push(Math.random()<0.5?m.home:m.away);
   });
   if(winners.length<2){state.copaRound=COPA_ROUNDS.length;return;}
-  // Nuevo bracket
   const newBracket=[];
   const shuffled=winners.sort(()=>Math.random()-0.5);
   for(let i=0;i<shuffled.length;i+=2){
@@ -775,12 +839,11 @@ function advanceCopaRound(){
   state.copaRound++;
   state.copaUserMatch=newBracket.find(m=>m.home===state.userClubId||m.away===state.userClubId)||null;
   state.copaPlayedThisRound=false;
-  if(!state.copaUserMatch)state.copaAlive=false; // no debería pasar si el usuario ganó
+  if(!state.copaUserMatch)state.copaAlive=false;
 }
 
 function nextMatchday(){
   if(state.matchday>=state.maxMatchdays){addNews("¡Fin de la temporada de liga!");updateAll();return}
-  // Avanzar copa si se jugó la ronda
   if(state.copaPlayedThisRound&&state.copaAlive){
     advanceCopaRound();
   }
@@ -810,13 +873,11 @@ function buyPlayer(id){
 function sellPlayer(id){
   const idx=state.players.findIndex(p=>p.id===id);if(idx===-1)return;
   const p=state.players[idx];
-  // Oferta realista: 70-110% del valor
   const offer=Math.round(p.value*(0.7+Math.random()*0.4));
   if(!confirm(`Oferta recibida por ${p.name}: ${formatMoney(offer)}.\n¿Aceptar venta?`))return;
   state.budget+=offer/1000;
   state.players.splice(idx,1);
   state.teams[state.userClubId].players=state.players;
-  // Añadir a lista de transferencias de otros clubes (opcional)
   addNews(`Venta: ${p.name} se marcha por ${formatMoney(offer)}`);
   addInbox("Secretaría Técnica","Venta cerrada",`${p.name} ha sido transferido. Presupuesto actualizado.`);
   updateAll();saveGame();
@@ -854,6 +915,9 @@ function loadGame(){
     const data=JSON.parse(raw);
     if(!data.userClubId||!data.teams)return false;
     Object.assign(state,data);
+    // Asegurar valores por defecto de ordenación si se carga una partida antigua
+    if(!state.squadSortBy) state.squadSortBy = "ca";
+    if(!state.squadSortDir) state.squadSortDir = "desc";
     return true;
   }catch(e){return false}
 }
@@ -893,6 +957,7 @@ function startNewGame(){
   state.matchday=1;state.morale=75;state.formation="4-2-3-1";state.mentality="balanced";
   state.style="gegenpress";state.pressing=70;state.defLine="standard";state.tempo="standard";
   state.news=[];state.inbox=[];state.matchPlayedThisMD=false;state.trainingApplied=false;
+  state.squadSortBy="ca"; state.squadSortDir="desc";
   initTeams();
   state.players=state.teams[state.userClubId].players;
   state.budget=state.teams[state.userClubId].budget;
@@ -959,6 +1024,22 @@ document.getElementById("btn-save").onclick=()=>{saveGame();alert("Partida guard
 document.getElementById("btn-new-game").onclick=()=>{
   if(confirm("¿Volver al menú principal? (puedes guardar antes)")){saveGame();showMainMenu()}
 };
+
+// Ordenación por columnas de la plantilla
+document.querySelectorAll("#squad thead th[data-sort]").forEach(th=>{
+  th.addEventListener("click",()=>{
+    const key = th.dataset.sort;
+    if(state.squadSortBy === key){
+      state.squadSortDir = state.squadSortDir === "asc" ? "desc" : "asc";
+    } else {
+      state.squadSortBy = key;
+      // Por defecto: números y valor descendente, nombre/posición ascendente
+      state.squadSortDir = (key === "name" || key === "pos") ? "asc" : "desc";
+    }
+    renderSquad();
+    saveGame();
+  });
+});
 
 // Init
 showMainMenu();
