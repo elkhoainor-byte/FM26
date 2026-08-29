@@ -335,12 +335,21 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:.8rem}
     </div>
   </section>
 
-  <section id="transfers" class="screen">
-    <div class="panel">
-      <div class="flex-between" style="margin-bottom:14px">
-        <h2>💰 Mercado de fichajes</h2>
-        <div>Presupuesto: <strong id="transfer-budget" style="color:var(--accent)">€0</strong></div>
-      </div>
+<section id="transfers" class="screen">
+  <div class="panel">
+    <div class="flex-between" style="margin-bottom:14px">
+      <h2>💰 Mercado de fichajes</h2>
+      <div>Presupuesto: <strong id="transfer-budget" style="color:var(--accent)">€0</strong></div>
+    </div>
+
+    <!-- Pestañas -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn secondary" id="tab-free" style="padding:8px 14px">Mercado libre</button>
+      <button class="btn" id="tab-clubs" style="padding:8px 14px">Clubes de La Liga</button>
+    </div>
+
+    <!-- Mercado libre (el actual) -->
+    <div id="free-market">
       <table>
         <thead>
           <tr><th>Pos</th><th>Jugador</th><th>Edad</th><th>CA</th><th>Club</th><th>Valor</th><th>Sueldo</th><th></th></tr>
@@ -348,7 +357,26 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:.8rem}
         <tbody id="transfer-table"></tbody>
       </table>
     </div>
-  </section>
+
+    <!-- Clubes de La Liga -->
+    <div id="clubs-market" style="display:none">
+      <div class="control-group" style="max-width:320px;margin-bottom:16px">
+        <label>Selecciona un club</label>
+        <select id="target-club-select"></select>
+      </div>
+      <div id="target-club-info" style="margin-bottom:12px;color:var(--muted);font-size:.9rem"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Pos</th><th>Jugador</th><th>Edad</th><th>CA</th><th>PA</th>
+            <th>Valor</th><th>Sueldo</th><th>Oferta</th>
+          </tr>
+        </thead>
+        <tbody id="target-squad-table"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
 
   <section id="inbox" class="screen">
     <div class="panel">
