@@ -793,98 +793,220 @@ function clearLineup(){
   renderLineupPlayers();
 }
 
-function calcTeamStrength(teamId, isUser=false){
+function calcTeamStrength(teamId, isUser = false) {
   const team = state.teams[teamId];
-  if(!team) return 55;
-  if(teamId.startsWith("mod")) return team.strength + rand(-3,3);
+  if (!team) return 55;
+  if (teamId.startsWith("mod")) return team.strength + rand(-4, 4);
 
   let players;
-  if(isUser && state.lineup && state.lineup.some(id => id)){
-    players = state.lineup.map(id => id ? state.players.find(p => p.id === id) : null).filter(p => p && !p.injured);
-    if(players.length < 8) players = team.players.filter(p => !p.injured).slice(0,11);
+  if (isUser && state.lineup && state.lineup.some(id => id)) {
+    players = state.lineup
+      .map(id => id ? state.players.find(p => p.id === id) : null)
+      .filter(p => p && !p.injured);
+    if (players.length < 8) {
+      players = team.players.filter(p => !p.injured).slice(0, 11);
+    }
   } else {
-    players = team.players.filter(p => !p.injured).slice(0,11);
+    players = team.players.filter(p => !p.injured).slice(0, 11);
   }
-  if(players.length < 8) return team.strength * 0.7;
 
-  let avg = players.reduce((s,p) => s + p.ca * (p.condition/100) * (p.form/7), 0) / players.length;
-  if(isUser){
-    const mentMod = {defensive:-3, cautious:-1.5, balanced:0, positive:1.5, attacking:3}[state.mentality] || 0;
-    const styleMod = {possession:1, counter:0.5, direct:0, gegenpress:2, tiki:1.5}[state.style] || 0;
-    avg += mentMod + styleMod + (state.pressing-50)/25;
+  if (players.length < 8) return team.strength * 0.65;
+
+  // Media ponderada por condición y forma
+  let total = 0;
+  players.forEach(p => {
+    const condFactor = 0.70 + (p.condition / 100) * 0.30; // condición influye menos extremo
+    const formFactor = 0.85 + (p.form / 10) * 0.30;
+    total += p.ca * condFactor * formFactor;
+  });
+
+  let avg = total / players.length;
+
+  // Bonus de moral del equipo (solo usuario)
+  if (isUser) {
+    avg += (state.morale - 70) * 0.08;
   }
-  return clamp(avg, 40, 99);
+
+  // Influencia táctica (solo usuario)
+  if (isUser) {
+    const mentMod = {
+      defensive: -2.8,
+      cautious: -1.4,
+      balanced: 0,
+      positive: 1.6,
+      attacking: 3.2
+    }[state.mentality] || 0;
+
+    const styleMod = {
+      possession: 1.2,
+      counter: 0.8,
+      direct: 0.3,
+      gegenpress: 1.8,
+      tiki: 1.5
+    }[state.style] || 0;
+
+    // Pressing alto cansa más pero da más intensidad
+    const pressMod = (state.pressing - 55) / 35;
+
+    avg += mentMod + styleMod + pressMod;
+  }
+
+  // Límite realista
+  return clamp(avg, 48, 94);
 }
 
-function simulateMatch(homeId, awayId){
+function simulateMatch(homeId, awayId) {
   const homeStr = calcTeamStrength(homeId, homeId === state.userClubId);
   const awayStr = calcTeamStrength(awayId, awayId === state.userClubId);
-  const hExp = 0.55 + (homeStr / 45) + 0.25;
-  const aExp = 0.50 + (awayStr / 48);
 
-  function goalsFromExp(exp){
-    let g = 0;
-    const attempts = 14;
-    const p = Math.min(0.42, exp / attempts);
-    for(let i=0; i<attempts; i++) if(Math.random() < p) g++;
-    if(Math.random() < 0.12) g += rand(0,1);
-    if(Math.random() < 0.08 && g > 0) g -= 1;
-    return Math.max(0, Math.min(g, 7));
+  // Ventaja de local realista (~0.35-0.45 goles de diferencia esperada)
+  const homeAdv = 0.38;
+
+  // Expected goals base
+  let hExp = 1.15 + (homeStr - 70) * 0.038 + homeAdv;
+  let aExp = 1.05 + (awayStr - 70) * 0.036;
+
+  // Ajuste por diferencia de calidad (los favoritos dominan más)
+  const diff = homeStr - awayStr;
+  if (diff > 12) {
+    hExp += (diff - 12) * 0.045;
+    aExp -= (diff - 12) * 0.025;
+  } else if (diff < -12) {
+    aExp += (-diff - 12) * 0.045;
+    hExp -= (-diff - 12) * 0.025;
   }
 
-  const hg = goalsFromExp(hExp);
-  const ag = goalsFromExp(aExp);
-  const events = [];
-  const homeName = state.teams[homeId] ? state.teams[homeId].name : homeId;
-  const awayName = state.teams[awayId] ? state.teams[awayId].name : awayId;
+  // Mentalidad ofensiva/defensiva del usuario afecta más
+  if (homeId === state.userClubId) {
+    if (state.mentality === "attacking") { hExp += 0.28; aExp += 0.12; }
+    if (state.mentality === "defensive") { hExp -= 0.22; aExp -= 0.18; }
+  }
+  if (awayId === state.userClubId) {
+    if (state.mentality === "attacking") { aExp += 0.28; hExp += 0.12; }
+    if (state.mentality === "defensive") { aExp -= 0.22; hExp -= 0.18; }
+  }
 
-  function getMatchPlayers(teamId){
-    if(teamId === state.userClubId && state.lineup.some(id => id)){
-      return state.lineup.map(id => id ? state.players.find(p => p.id === id) : null).filter(p => p && !p.injured);
+  // Evitar valores absurdos
+  hExp = clamp(hExp, 0.35, 3.4);
+  aExp = clamp(aExp, 0.30, 3.2);
+
+  // Función de goles más realista (distribución tipo Poisson suavizada)
+  function generateGoals(exp) {
+    // Usamos una aproximación discreta más controlada
+    const r = Math.random();
+    if (exp < 0.7) {
+      if (r < 0.52) return 0;
+      if (r < 0.88) return 1;
+      return 2;
     }
-    return (state.teams[teamId] && state.teams[teamId].players) ? state.teams[teamId].players.filter(p => !p.injured) : [];
+    if (exp < 1.15) {
+      if (r < 0.32) return 0;
+      if (r < 0.72) return 1;
+      if (r < 0.93) return 2;
+      return 3;
+    }
+    if (exp < 1.7) {
+      if (r < 0.18) return 0;
+      if (r < 0.52) return 1;
+      if (r < 0.82) return 2;
+      if (r < 0.95) return 3;
+      return 4;
+    }
+    if (exp < 2.3) {
+      if (r < 0.10) return 0;
+      if (r < 0.35) return 1;
+      if (r < 0.65) return 2;
+      if (r < 0.87) return 3;
+      if (r < 0.97) return 4;
+      return 5;
+    }
+    // Partidos muy ofensivos
+    if (r < 0.06) return 0;
+    if (r < 0.22) return 1;
+    if (r < 0.48) return 2;
+    if (r < 0.75) return 3;
+    if (r < 0.92) return 4;
+    return 5 + (Math.random() < 0.35 ? 1 : 0);
+  }
+
+  let hg = generateGoals(hExp);
+  let ag = generateGoals(aExp);
+
+  // Reducir ligeramente la probabilidad de resultados muy locos
+  if (hg + ag >= 6 && Math.random() < 0.55) {
+    if (hg > ag) hg--;
+    else if (ag > hg) ag--;
+    else if (Math.random() < 0.5) hg--;
+    else ag--;
+  }
+
+  // Eventos del partido
+  const events = [];
+  const homeName = state.teams[homeId]?.name || homeId;
+  const awayName = state.teams[awayId]?.name || awayId;
+
+  function getMatchPlayers(teamId) {
+    if (teamId === state.userClubId && state.lineup.some(id => id)) {
+      return state.lineup
+        .map(id => id ? state.players.find(p => p.id === id) : null)
+        .filter(p => p && !p.injured);
+    }
+    return (state.teams[teamId]?.players || []).filter(p => !p.injured);
   }
 
   const homePlayers = getMatchPlayers(homeId);
   const awayPlayers = getMatchPlayers(awayId);
 
-  // Prioridad de goleadores: delanteros > extremos/mediapuntas > mediocentros
-  const attackPos = ["DC","DI","DD","EI","ED","MP"];
-  const midPos = ["MC","MI","MD","PIV"];
+  const attackPos = ["DC", "DI", "DD", "EI", "ED", "MP"];
+  const midPos = ["MC", "MI", "MD", "PIV", "CI", "CD"];
 
-  const minutes = [];
-  for(let j=0; j<hg+ag; j++) minutes.push(rand(3,92));
-  minutes.sort((a,b) => a-b);
+  // Generar minutos de los goles
+  const goalMinutes = [];
+  for (let i = 0; i < hg + ag; i++) {
+    goalMinutes.push(rand(4, 93));
+  }
+  goalMinutes.sort((a, b) => a - b);
 
   let hs = 0, as_ = 0;
-  minutes.forEach(min => {
-    if(hs < hg && (as_ >= ag || Math.random() < 0.55)){
+  goalMinutes.forEach(min => {
+    const homeScores = (hs < hg) && (as_ >= ag || Math.random() < 0.52);
+
+    if (homeScores && hs < hg) {
       let pool = homePlayers.filter(p => attackPos.includes(p.pos));
-      if(!pool.length) pool = homePlayers.filter(p => midPos.includes(p.pos));
-      if(!pool.length) pool = homePlayers;
-      const scorer = pool.length ? pick(pool) : {name:"Jugador"};
-      events.push({min, type:"goal", text:`⚽ GOL! ${scorer.name} (${homeName})`});
+      if (pool.length === 0) pool = homePlayers.filter(p => midPos.includes(p.pos));
+      if (pool.length === 0) pool = homePlayers;
+      const scorer = pool.length ? pick(pool) : { name: "Jugador" };
+      events.push({ min, type: "goal", text: `⚽ GOL! ${scorer.name} (${homeName})` });
       hs++;
-    } else if(as_ < ag){
-      let pool2 = awayPlayers.filter(p => attackPos.includes(p.pos));
-      if(!pool2.length) pool2 = awayPlayers.filter(p => midPos.includes(p.pos));
-      if(!pool2.length) pool2 = awayPlayers;
-      const scorer2 = pool2.length ? pick(pool2) : {name:"Jugador"};
-      events.push({min, type:"goal", text:`⚽ GOL! ${scorer2.name} (${awayName})`});
+    } else if (as_ < ag) {
+      let pool = awayPlayers.filter(p => attackPos.includes(p.pos));
+      if (pool.length === 0) pool = awayPlayers.filter(p => midPos.includes(p.pos));
+      if (pool.length === 0) pool = awayPlayers;
+      const scorer = pool.length ? pick(pool) : { name: "Jugador" };
+      events.push({ min, type: "goal", text: `⚽ GOL! ${scorer.name} (${awayName})` });
       as_++;
     }
   });
 
-  for(let k=0; k<rand(1,4); k++){
-    const min2 = rand(10,90);
-    const team = Math.random() < 0.5 ? homeName : awayName;
-    const pl = team === homeName ? homePlayers : awayPlayers;
-    const p = pl.length ? pick(pl) : {name:"Jugador"};
-    if(Math.random() < 0.85) events.push({min:min2, type:"card-y", text:`🟨 Tarjeta amarilla para ${p.name} (${team})`});
-    else events.push({min:min2, type:"card-r", text:`🟥 ¡Tarjeta roja! ${p.name} (${team})`});
+  // Tarjetas (menos frecuentes y más realistas)
+  const numCards = rand(1, 4);
+  for (let i = 0; i < numCards; i++) {
+    const min = rand(12, 90);
+    const isHome = Math.random() < 0.5;
+    const pl = isHome ? homePlayers : awayPlayers;
+    const teamName = isHome ? homeName : awayName;
+    const p = pl.length ? pick(pl) : { name: "Jugador" };
+
+    if (Math.random() < 0.88) {
+      events.push({ min, type: "card-y", text: `🟨 ${p.name} (${teamName})` });
+    } else {
+      events.push({ min, type: "card-r", text: `🟥 ¡Roja! ${p.name} (${teamName})` });
+    }
   }
-  events.sort((a,b) => a.min - b.min);
-  return {homeGoals: hg, awayGoals: ag, events};
+
+  events.sort((a, b) => a.min - b.min);
+
+  return { homeGoals: hg, awayGoals: ag, events };
 }
 
 function applyResult(homeId, awayId, hg, ag){
