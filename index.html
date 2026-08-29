@@ -1188,10 +1188,33 @@ function renderDashboard(){
   ).join("") || "<div style='color:var(--muted)'>Sin noticias.</div>";
 }
 
-case "goals": va = a.goals||0; vb = b.goals||0; break;
-case "assists": va = a.assists||0; vb = b.assists||0; break;
-case "apps": va = a.apps||0; vb = b.apps||0; break;
-case "rating": va = a.avgRating||0; vb = b.avgRating||0; break;
+function sortSquadList(list){
+  const by = state.squadSortBy;
+  const dir = state.squadSortDir === "asc" ? 1 : -1;
+  return [...list].sort((a,b) => {
+    let va, vb;
+    switch(by){
+      case "pos": va = POS_ORDER[a.pos]||99; vb = POS_ORDER[b.pos]||99; break;
+      case "name": return dir * a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+      case "age": va=a.age; vb=b.age; break;
+      case "ca": va=a.ca; vb=b.ca; break;
+      case "pa": va=a.pa; vb=b.pa; break;
+      case "condition": va=a.condition; vb=b.condition; break;
+      case "morale": va=a.morale; vb=b.morale; break;
+      case "value": va=a.value; vb=b.value; break;
+      case "wage": va=a.wage; vb=b.wage; break;
+      case "status": va=a.injured?1:0; vb=b.injured?1:0; break;
+      case "goals": va = a.goals||0; vb = b.goals||0; break;
+      case "assists": va = a.assists||0; vb = b.assists||0; break;
+      case "apps": va = a.apps||0; vb = b.apps||0; break;
+      case "rating": va = a.avgRating||0; vb = b.avgRating||0; break;
+      default: va=a.ca; vb=b.ca;
+    }
+    if(va < vb) return -1 * dir;
+    if(va > vb) return 1 * dir;
+    return b.ca - a.ca;
+  });
+}
 
 function updateSortHeaders(){
   document.querySelectorAll("#squad thead th[data-sort]").forEach(th => {
