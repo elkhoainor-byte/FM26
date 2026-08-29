@@ -1152,6 +1152,8 @@ function renderCopa(){
 
 function renderTransfers(){
   document.getElementById("transfer-budget").textContent = formatMoney(state.budget * 1000);
+  
+  // Mercado libre
   document.getElementById("transfer-table").innerHTML = state.transferList.map(p => `
     <tr>
       <td class="pos ${p.pos}">${p.pos}</td>
@@ -1163,6 +1165,134 @@ function renderTransfers(){
       <td>${formatMoney(p.wage)}/sem</td>
       <td><button class="btn" style="padding:5px 10px;font-size:.8rem" onclick="buyPlayer('${p.id}')">Fichar</button></td>
     </tr>`).join("");
+
+  // Rellenar selector de clubes
+  renderClubSelectForTransfers();
+}
+
+function renderClubSelectForTransfers(){
+  const select = document.getElementById("target-club-select");
+  if(!select) return;
+  select.innerHTML = CLUBS
+    .filter(c => c.id !== state.userClubId)
+    .map(c => `<option value="${c.id}">${c.name}</option>`)
+    .join("");
+  
+  select.onchange = () => renderTargetSquad(select.value);
+  // Cargar el primero por defecto
+  if(select.value) renderTargetSquad(select.value);
+}
+
+function renderTargetSquad(clubId){
+  const team = state.teams[clubId];
+  if(!team) return;
+
+  document.getElementById("target-club-info").innerHTML = 
+    `<strong>${team.name}</strong> · Entrenador: ${team.manager} · Rating: ${team.rating}`;
+
+  const players = [...team.players].sort((a,b) => b.ca - a.ca);
+
+  document.getElementById("target-squad-table").innerHTML = players.map(p => `
+    <tr>
+      <td class="pos ${p.pos}">${p.pos}</td>
+      <td>${p.name}</td>
+      <td>${p.age}</td>
+      <td class="rating">${p.ca}</td>
+      <td class="stat">${p.pa}</td>
+      <td>${formatMoney(p.value)}</td>
+      <td>${formatMoney(p.wage)}/sem</td>
+      <td>
+        <button class="btn" style="padding:5px 10px;font-size:.8rem" 
+          onclick="makeOffer('${clubId}','${p.id}')">
+          Ofertar
+        </button>
+      </td>
+    </tr>
+  `).join("");
+}
+
+function makeOffer(fromClubId, playerId){
+  const team = state.teams[fromClubId];
+  if(!team) return;
+  const player = team.players.find(p => p.id === playerId);
+  if(!player) return;
+
+  // Oferta mínima sugerida
+  const minOffer = Math.round(player.value * 0.85);
+  const suggested = Math.round(player.value * 1.15);
+
+  const input = prompt(
+    `¿Cuánto ofreces por ${player.name}?\n\n` +
+    `Valor de mercado: ${formatMoney(player.value)}\n` +
+    `Oferta recomendada: ${formatMoney(suggested)}\n` +
+    `Presupuesto disponible: ${formatMoney(state.budget * 1000)}`,
+    suggested
+  );
+
+  if(input === null) return; // canceló
+  const offer = parseInt(input);
+  if(isNaN(offer) || offer <= 0){
+    alert("Cantidad no válida.");
+    return;
+  }
+
+  if(offer > state.budget * 1000){
+    alert("No tienes suficiente presupuesto.");
+    return;
+  }
+
+  // Lógica de aceptación
+  const ratio = offer / player.value;
+  let acceptChance = 0;
+
+  if(ratio >= 1.4) acceptChance = 0.92;
+  else if(ratio >= 1.2) acceptChance = 0.75;
+  else if(ratio >= 1.05) acceptChance = 0.55;
+  else if(ratio >= 0.95) acceptChance = 0.30;
+  else if(ratio >= 0.80) acceptChance = 0.12;
+  else acceptChance = 0.03;
+
+  // Equipos grandes son más duros
+  const bigClubs = ["rm","bar","atm"];
+  if(bigClubs.includes(fromClubId)) acceptChance *= 0.70;
+
+  // Jugadores muy buenos (CA alto) también más difíciles
+  if(player.ca >= 160) acceptChance *= 0.85;
+  if(player.ca >= 170) acceptChance *= 0.75;
+
+  const accepted = Math.random() < acceptChance;
+
+  if(accepted){
+    // Fichaje aceptado
+    state.budget -= offer / 1000;
+    
+    // Quitar del equipo rival
+    team.players = team.players.filter(p => p.id !== playerId);
+    
+    // Añadir a tu equipo
+    const newPlayer = {...player};
+    state.players.push(newPlayer);
+    state.teams[state.userClubId].players = state.players;
+
+    addNews(`¡Fichaje! ${player.name} llega procedente del ${team.name} por ${formatMoney(offer)}`);
+    addInbox("Secretaría Técnica", "Fichaje cerrado", 
+      `${player.name} ha firmado por el club. Coste: ${formatMoney(offer)}.`);
+    
+    alert(`¡El ${team.name} ha aceptado tu oferta de ${formatMoney(offer)} por ${player.name}!`);
+    
+    renderTargetSquad(fromClubId);
+    updateAll();
+    saveGame();
+  } else {
+    // Rechazado
+    let msg = "";
+    if(ratio < 0.9) msg = "Oferta demasiado baja. Ni se la han planteado.";
+    else if(ratio < 1.1) msg = "El club considera que la oferta es insuficiente.";
+    else msg = "El jugador no quiere marcharse / el club no vende a ese precio.";
+    
+    alert(`Oferta rechazada.\n\n${msg}`);
+    addNews(`Oferta rechazada: ${team.name} no vende a ${player.name}`);
+  }
 }
 
 function renderInbox(){
@@ -1586,6 +1716,26 @@ document.querySelectorAll("#squad thead th[data-sort]").forEach(th => {
     saveGame();
   });
 });
+
+// Pestañas del mercado
+document.getElementById("tab-free").onclick = () => {
+  document.getElementById("free-market").style.display = "block";
+  document.getElementById("clubs-market").style.display = "none";
+  document.getElementById("tab-free").classList.add("btn");
+  document.getElementById("tab-free").classList.remove("secondary");
+  document.getElementById("tab-clubs").classList.add("secondary");
+  document.getElementById("tab-clubs").classList.remove("btn");
+};
+
+document.getElementById("tab-clubs").onclick = () => {
+  document.getElementById("free-market").style.display = "none";
+  document.getElementById("clubs-market").style.display = "block";
+  document.getElementById("tab-clubs").classList.add("btn");
+  document.getElementById("tab-clubs").classList.remove("secondary");
+  document.getElementById("tab-free").classList.add("secondary");
+  document.getElementById("tab-free").classList.remove("btn");
+  renderClubSelectForTransfers();
+};
 
 // Iniciar
 showMainMenu();
