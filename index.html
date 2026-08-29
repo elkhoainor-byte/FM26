@@ -102,44 +102,26 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:.8rem}
 .lineup-player.in-xi{opacity:.45;pointer-events:none}
 .lineup-player .ppos{font-weight:700;width:36px;font-size:.75rem}
 .lineup-hint{font-size:.8rem;color:var(--muted);margin-bottom:8px;padding:8px;background:rgba(0,0,0,.25);border-radius:6px}
-/* Ficha de jugador */
-.player-modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,.75);
-  z-index: 500; display: flex; align-items: center; justify-content: center;
-  padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s;
-}
-.player-modal-overlay.visible { opacity: 1; pointer-events: auto; }
-.player-modal {
-  background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
-  width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto;
-  padding: 24px; position: relative; animation: fadeIn .25s ease;
-}
-.player-modal .close-btn {
-  position: absolute; top: 14px; right: 14px; background: transparent;
-  border: none; color: var(--muted); font-size: 1.4rem; cursor: pointer;
-}
-.player-modal .close-btn:hover { color: var(--text); }
-.player-photo-wrap {
-  width: 110px; height: 110px; border-radius: 50%; overflow: hidden;
-  background: var(--bg); border: 3px solid var(--accent); margin: 0 auto 14px;
-  display: flex; align-items: center; justify-content: center; position: relative;
-}
-.player-photo-wrap img { width: 100%; height: 100%; object-fit: cover; }
-.player-photo-wrap .placeholder { font-size: 2.2rem; color: var(--muted); }
-.player-photo-actions { text-align: center; margin-bottom: 18px; }
-.player-photo-actions button { margin: 0 4px; padding: 6px 12px; font-size: .8rem; }
-.attr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
-.attr-box { background: rgba(0,0,0,.25); border-radius: 8px; padding: 10px 12px; }
-.attr-box .label { font-size: .72rem; color: var(--muted); }
-.attr-box .value { font-size: 1.15rem; font-weight: 700; color: var(--accent); }
-.stats-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
-.stat-chip {
-  background: rgba(0,212,170,.1); border: 1px solid rgba(0,212,170,.25);
-  border-radius: 6px; padding: 6px 10px; font-size: .82rem;
-}
-.stat-chip strong { color: var(--accent); }
-.player-name-click { cursor: pointer; }
-.player-name-click:hover { color: var(--accent); text-decoration: underline; }
+.player-name-click{cursor:pointer}.player-name-click:hover{color:var(--accent);text-decoration:underline}
+
+/* Modal jugador */
+.player-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.player-modal-overlay.visible{opacity:1;pointer-events:auto}
+.player-modal{background:var(--panel);border:1px solid var(--border);border-radius:14px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;padding:24px;position:relative;animation:fadeIn .25s ease}
+.player-modal .close-btn{position:absolute;top:14px;right:14px;background:transparent;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer}
+.player-modal .close-btn:hover{color:var(--text)}
+.player-photo-wrap{width:110px;height:110px;border-radius:50%;overflow:hidden;background:var(--bg);border:3px solid var(--accent);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;position:relative}
+.player-photo-wrap img{width:100%;height:100%;object-fit:cover}
+.player-photo-wrap .placeholder{font-size:2.2rem;color:var(--muted)}
+.player-photo-actions{text-align:center;margin-bottom:18px}
+.player-photo-actions button{margin:0 4px;padding:6px 12px;font-size:.8rem}
+.attr-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.attr-box{background:rgba(0,0,0,.25);border-radius:8px;padding:10px 12px}
+.attr-box .label{font-size:.72rem;color:var(--muted)}
+.attr-box .value{font-size:1.15rem;font-weight:700;color:var(--accent)}
+.stats-row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.stat-chip{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);border-radius:6px;padding:6px 10px;font-size:.82rem}
+.stat-chip strong{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -147,13 +129,11 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:.8rem}
 <div id="start-menu">
   <div class="start-logo">FM<span>26 Web</span></div>
   <div class="start-sub">Simulador inspirado en Football Manager · Datos cruzados sortitoutsi + Transfermarkt</div>
-  
   <div id="main-menu-view" class="start-actions">
     <button class="btn" id="btn-continue-career" style="display:none">▶ Seguir carrera</button>
     <button class="btn" id="btn-new-career">＋ Comenzar partida nueva</button>
     <div class="save-info" id="save-info"></div>
   </div>
-
   <div id="club-select-view">
     <h2 style="text-align:center;margin-bottom:8px">Elige tu club · La Liga 2025/26</h2>
     <p style="text-align:center;color:var(--muted);margin-bottom:8px;font-size:.9rem">Presupuestos y ratings basados en sortitoutsi.net / FM26</p>
@@ -180,49 +160,6 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:.8rem}
   </div>
 </header>
 
-<!-- Modal Ficha de Jugador -->
-<div class="player-modal-overlay" id="player-modal">
-  <div class="player-modal">
-    <button class="close-btn" id="close-player-modal">×</button>
-    
-    <div class="player-photo-wrap" id="player-photo-wrap">
-      <div class="placeholder" id="player-photo-placeholder">👤</div>
-      <img id="player-photo-img" style="display:none" alt="Foto jugador">
-    </div>
-    
-    <div class="player-photo-actions">
-      <button class="btn secondary" id="btn-upload-photo">Subir foto</button>
-      <button class="btn secondary" id="btn-url-photo">URL</button>
-      <button class="btn secondary" id="btn-remove-photo">Quitar</button>
-      <input type="file" id="photo-file-input" accept="image/*" style="display:none">
-    </div>
-
-    <h2 id="pm-name" style="text-align:center;margin-bottom:4px">—</h2>
-    <div id="pm-pos-age" style="text-align:center;color:var(--muted);margin-bottom:16px">—</div>
-
-    <div class="attr-grid">
-      <div class="attr-box"><div class="label">CA</div><div class="value" id="pm-ca">—</div></div>
-      <div class="attr-box"><div class="label">PA</div><div class="value" id="pm-pa">—</div></div>
-      <div class="attr-box"><div class="label">Condición</div><div class="value" id="pm-cond">—</div></div>
-      <div class="attr-box"><div class="label">Moral</div><div class="value" id="pm-morale">—</div></div>
-      <div class="attr-box"><div class="label">Forma</div><div class="value" id="pm-form">—</div></div>
-      <div class="attr-box"><div class="label">Valor</div><div class="value" id="pm-value">—</div></div>
-    </div>
-
-    <h3>Estadísticas 2025/26</h3>
-    <div class="stats-row" id="pm-stats"></div>
-
-    <h3 style="margin-top:16px">Contrato & Sueldo</h3>
-    <div class="attr-grid">
-      <div class="attr-box"><div class="label">Sueldo semanal</div><div class="value" id="pm-wage">—</div></div>
-      <div class="attr-box"><div class="label">Contrato hasta</div><div class="value" id="pm-contract">—</div></div>
-    </div>
-
-    <h3 style="margin-top:16px">Historial</h3>
-    <div id="pm-history" style="font-size:.88rem;color:var(--muted);line-height:1.5"></div>
-  </div>
-</div>
-  
 <nav id="main-nav">
   <button data-screen="dashboard" class="active">Inicio</button>
   <button data-screen="squad">Plantilla</button>
@@ -366,7 +303,6 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:.8rem}
         </div>
         <button class="btn" id="btn-save-tactics" style="width:100%;margin-top:6px">Guardar táctica</button>
         <div id="tactics-feedback" style="margin-top:8px;font-size:.85rem;color:var(--accent)"></div>
-
         <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
         <h3>Jugadores disponibles</h3>
         <div class="lineup-hint" id="lineup-hint">Selecciona primero una posición en el campo</div>
@@ -398,10 +334,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:.8rem}
       <h2>🏆 Clasificación - La Liga 2025/26</h2>
       <table class="standings">
         <thead>
-          <tr>
-            <th>#</th><th>Equipo</th><th>Entrenador</th><th>PJ</th><th>G</th><th>E</th><th>P</th>
-            <th>GF</th><th>GC</th><th>DG</th><th>Pts</th><th>Forma</th>
-          </tr>
+          <tr><th>#</th><th>Equipo</th><th>Entrenador</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th><th>Forma</th></tr>
         </thead>
         <tbody id="standings-body"></tbody>
       </table>
@@ -416,48 +349,35 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:.8rem}
     </div>
   </section>
 
-<section id="transfers" class="screen">
-  <div class="panel">
-    <div class="flex-between" style="margin-bottom:14px">
-      <h2>💰 Mercado de fichajes</h2>
-      <div>Presupuesto: <strong id="transfer-budget" style="color:var(--accent)">€0</strong></div>
-    </div>
-
-    <!-- Pestañas -->
-    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
-      <button class="btn secondary" id="tab-free" style="padding:8px 14px">Mercado libre</button>
-      <button class="btn" id="tab-clubs" style="padding:8px 14px">Clubes de La Liga</button>
-    </div>
-
-    <!-- Mercado libre (el actual) -->
-    <div id="free-market">
-      <table>
-        <thead>
-          <tr><th>Pos</th><th>Jugador</th><th>Edad</th><th>CA</th><th>Club</th><th>Valor</th><th>Sueldo</th><th></th></tr>
-        </thead>
-        <tbody id="transfer-table"></tbody>
-      </table>
-    </div>
-
-    <!-- Clubes de La Liga -->
-    <div id="clubs-market" style="display:none">
-      <div class="control-group" style="max-width:320px;margin-bottom:16px">
-        <label>Selecciona un club</label>
-        <select id="target-club-select"></select>
+  <section id="transfers" class="screen">
+    <div class="panel">
+      <div class="flex-between" style="margin-bottom:14px">
+        <h2>💰 Mercado de fichajes</h2>
+        <div>Presupuesto: <strong id="transfer-budget" style="color:var(--accent)">€0</strong></div>
       </div>
-      <div id="target-club-info" style="margin-bottom:12px;color:var(--muted);font-size:.9rem"></div>
-      <table>
-        <thead>
-          <tr>
-            <th>Pos</th><th>Jugador</th><th>Edad</th><th>CA</th><th>PA</th>
-            <th>Valor</th><th>Sueldo</th><th>Oferta</th>
-          </tr>
-        </thead>
-        <tbody id="target-squad-table"></tbody>
-      </table>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="btn secondary" id="tab-free" style="padding:8px 14px">Mercado libre</button>
+        <button class="btn" id="tab-clubs" style="padding:8px 14px">Clubes de La Liga</button>
+      </div>
+      <div id="free-market">
+        <table>
+          <thead><tr><th>Pos</th><th>Jugador</th><th>Edad</th><th>CA</th><th>Club</th><th>Valor</th><th>Sueldo</th><th></th></tr></thead>
+          <tbody id="transfer-table"></tbody>
+        </table>
+      </div>
+      <div id="clubs-market" style="display:none">
+        <div class="control-group" style="max-width:320px;margin-bottom:16px">
+          <label>Selecciona un club</label>
+          <select id="target-club-select"></select>
+        </div>
+        <div id="target-club-info" style="margin-bottom:12px;color:var(--muted);font-size:.9rem"></div>
+        <table>
+          <thead><tr><th>Pos</th><th>Jugador</th><th>Edad</th><th>CA</th><th>PA</th><th>Valor</th><th>Sueldo</th><th>Oferta</th></tr></thead>
+          <tbody id="target-squad-table"></tbody>
+        </table>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
   <section id="inbox" class="screen">
     <div class="panel">
@@ -503,6 +423,42 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:.8rem}
 <footer>Simulador inspirado en Football Manager · Datos cruzados sortitoutsi.net + Transfermarkt · No oficial</footer>
 </div>
 
+<!-- Modal Ficha de Jugador -->
+<div class="player-modal-overlay" id="player-modal">
+  <div class="player-modal">
+    <button class="close-btn" id="close-player-modal">×</button>
+    <div class="player-photo-wrap" id="player-photo-wrap">
+      <div class="placeholder" id="player-photo-placeholder">👤</div>
+      <img id="player-photo-img" style="display:none" alt="Foto jugador">
+    </div>
+    <div class="player-photo-actions">
+      <button class="btn secondary" id="btn-upload-photo">Subir foto</button>
+      <button class="btn secondary" id="btn-url-photo">URL</button>
+      <button class="btn secondary" id="btn-remove-photo">Quitar</button>
+      <input type="file" id="photo-file-input" accept="image/*" style="display:none">
+    </div>
+    <h2 id="pm-name" style="text-align:center;margin-bottom:4px">—</h2>
+    <div id="pm-pos-age" style="text-align:center;color:var(--muted);margin-bottom:16px">—</div>
+    <div class="attr-grid">
+      <div class="attr-box"><div class="label">CA</div><div class="value" id="pm-ca">—</div></div>
+      <div class="attr-box"><div class="label">PA</div><div class="value" id="pm-pa">—</div></div>
+      <div class="attr-box"><div class="label">Condición</div><div class="value" id="pm-cond">—</div></div>
+      <div class="attr-box"><div class="label">Moral</div><div class="value" id="pm-morale">—</div></div>
+      <div class="attr-box"><div class="label">Forma</div><div class="value" id="pm-form">—</div></div>
+      <div class="attr-box"><div class="label">Valor</div><div class="value" id="pm-value">—</div></div>
+    </div>
+    <h3>Estadísticas 2025/26</h3>
+    <div class="stats-row" id="pm-stats"></div>
+    <h3 style="margin-top:16px">Contrato & Sueldo</h3>
+    <div class="attr-grid">
+      <div class="attr-box"><div class="label">Sueldo semanal</div><div class="value" id="pm-wage">—</div></div>
+      <div class="attr-box"><div class="label">Contrato hasta</div><div class="value" id="pm-contract">—</div></div>
+    </div>
+    <h3 style="margin-top:16px">Historial</h3>
+    <div id="pm-history" style="font-size:.88rem;color:var(--muted);line-height:1.5"></div>
+  </div>
+</div>
+
 <script>
 const CLUBS = [
   {id:"rm", name:"Real Madrid", short:"RMA", strength:92, budget:50, wageBudget:6, balance:117, att:73170, manager:"José Mourinho", rating:90, potential:95},
@@ -544,82 +500,66 @@ const STAR_PLAYERS = {
     {name:"Dean Huijsen",pos:"DFC",age:21,ca:148,pa:175,mv:65}
   ],
   bar: [
-  // Porteros
-  {name:"Joan García", pos:"GK", age:25, ca:162, pa:175, mv:45},
-  {name:"Dominik Livaković", pos:"GK", age:31, ca:148, pa:152, mv:12},
-  {name:"Wojciech Szczęsny", pos:"GK", age:36, ca:145, pa:145, mv:3},
-
-  // Defensas
-  {name:"Pau Cubarsí", pos:"DFC", age:19, ca:165, pa:185, mv:90},
-  {name:"Eric García", pos:"DFC", age:25, ca:152, pa:160, mv:28},
-  {name:"Andreas Christensen", pos:"DFC", age:30, ca:150, pa:152, mv:18},
-  {name:"Álvaro Cortés", pos:"DFC", age:20, ca:128, pa:155, mv:8},
-  {name:"Alejandro Balde", pos:"LI", age:22, ca:160, pa:175, mv:70},
-  {name:"Gerard Martín", pos:"LI", age:24, ca:142, pa:158, mv:18},
-  {name:"Jules Koundé", pos:"LD", age:27, ca:165, pa:172, mv:65},
-  {name:"Héctor Fort", pos:"LD", age:20, ca:140, pa:165, mv:22},
-  {name:"João Cancelo", pos:"LD", age:32, ca:152, pa:155, mv:18},
-
-  // Mediocentros / Pivotes
-  {name:"Marc Bernal", pos:"PIV", age:19, ca:148, pa:175, mv:35},
-  {name:"Marc Casadó", pos:"PIV", age:23, ca:152, pa:168, mv:40},
-  {name:"Rodri", pos:"PIV", age:19, ca:122, pa:150, mv:5},
-  {name:"Pedri", pos:"MC", age:23, ca:178, pa:185, mv:120},
-  {name:"Frenkie de Jong", pos:"MC", age:29, ca:168, pa:172, mv:55},
-  {name:"Gavi", pos:"MC", age:22, ca:165, pa:178, mv:80},
-  {name:"Fermín López", pos:"MP", age:23, ca:162, pa:175, mv:60},
-  {name:"Dani Olmo", pos:"MP", age:28, ca:162, pa:168, mv:50},
-  {name:"Xavi Espart", pos:"MC", age:19, ca:125, pa:155, mv:6},
-  {name:"Guille Fernández", pos:"MC", age:18, ca:120, pa:155, mv:5},
-  {name:"Brian Fariñas", pos:"MC", age:19, ca:118, pa:150, mv:4},
-  {name:"Toni Fernández", pos:"MP", age:18, ca:125, pa:160, mv:8},
-
-  // Extremos y delanteros
-  {name:"Lamine Yamal", pos:"ED", age:19, ca:185, pa:195, mv:200},
-  {name:"Raphinha", pos:"ED", age:29, ca:168, pa:172, mv:60},
-  {name:"Anthony Gordon", pos:"EI", age:25, ca:158, pa:168, mv:55},
-  {name:"Karim Adeyemi", pos:"EI", age:24, ca:160, pa:172, mv:55},
-  {name:"Roony Bardghji", pos:"ED", age:20, ca:145, pa:168, mv:25},
-  {name:"Jesse Bisiwu", pos:"EI", age:18, ca:115, pa:150, mv:4},
-  {name:"Hamza Abdelkarim", pos:"DC", age:19, ca:130, pa:160, mv:10}
-],
+    {name:"Joan García",pos:"GK",age:25,ca:162,pa:175,mv:45},
+    {name:"Dominik Livaković",pos:"GK",age:31,ca:148,pa:152,mv:12},
+    {name:"Wojciech Szczęsny",pos:"GK",age:36,ca:145,pa:145,mv:3},
+    {name:"Pau Cubarsí",pos:"DFC",age:19,ca:165,pa:185,mv:90},
+    {name:"Eric García",pos:"DFC",age:25,ca:152,pa:160,mv:28},
+    {name:"Andreas Christensen",pos:"DFC",age:30,ca:150,pa:152,mv:18},
+    {name:"Álvaro Cortés",pos:"DFC",age:20,ca:128,pa:155,mv:8},
+    {name:"Alejandro Balde",pos:"LI",age:22,ca:160,pa:175,mv:70},
+    {name:"Gerard Martín",pos:"LI",age:24,ca:142,pa:158,mv:18},
+    {name:"Jules Koundé",pos:"LD",age:27,ca:165,pa:172,mv:65},
+    {name:"Héctor Fort",pos:"LD",age:20,ca:140,pa:165,mv:22},
+    {name:"João Cancelo",pos:"LD",age:32,ca:152,pa:155,mv:18},
+    {name:"Marc Bernal",pos:"PIV",age:19,ca:148,pa:175,mv:35},
+    {name:"Marc Casadó",pos:"PIV",age:23,ca:152,pa:168,mv:40},
+    {name:"Rodri",pos:"PIV",age:19,ca:122,pa:150,mv:5},
+    {name:"Pedri",pos:"MC",age:23,ca:178,pa:185,mv:120},
+    {name:"Frenkie de Jong",pos:"MC",age:29,ca:168,pa:172,mv:55},
+    {name:"Gavi",pos:"MC",age:22,ca:165,pa:178,mv:80},
+    {name:"Fermín López",pos:"MP",age:23,ca:162,pa:175,mv:60},
+    {name:"Dani Olmo",pos:"MP",age:28,ca:162,pa:168,mv:50},
+    {name:"Xavi Espart",pos:"MC",age:19,ca:125,pa:155,mv:6},
+    {name:"Guille Fernández",pos:"MC",age:18,ca:120,pa:155,mv:5},
+    {name:"Brian Fariñas",pos:"MC",age:19,ca:118,pa:150,mv:4},
+    {name:"Toni Fernández",pos:"MP",age:18,ca:125,pa:160,mv:8},
+    {name:"Lamine Yamal",pos:"ED",age:19,ca:185,pa:195,mv:200},
+    {name:"Raphinha",pos:"ED",age:29,ca:168,pa:172,mv:60},
+    {name:"Anthony Gordon",pos:"EI",age:25,ca:158,pa:168,mv:55},
+    {name:"Karim Adeyemi",pos:"EI",age:24,ca:160,pa:172,mv:55},
+    {name:"Roony Bardghji",pos:"ED",age:20,ca:145,pa:168,mv:25},
+    {name:"Jesse Bisiwu",pos:"EI",age:18,ca:115,pa:150,mv:4},
+    {name:"Hamza Abdelkarim",pos:"DC",age:19,ca:130,pa:160,mv:10}
+  ],
   atm: [
-  // Porteros
-  {name:"Jan Oblak", pos:"GK", age:33, ca:165, pa:168, mv:25},
-  {name:"Juan Musso", pos:"GK", age:32, ca:145, pa:148, mv:8},
-
-  // Defensas
-  {name:"Cristian Romero", pos:"DFC", age:28, ca:162, pa:168, mv:55},
-  {name:"Robin Le Normand", pos:"DFC", age:29, ca:158, pa:162, mv:45},
-  {name:"José María Giménez", pos:"DFC", age:31, ca:155, pa:158, mv:28},
-  {name:"Dávid Hancko", pos:"DFC", age:28, ca:155, pa:162, mv:40},
-  {name:"Marc Pubill", pos:"LD", age:23, ca:148, pa:168, mv:35},
-  {name:"Alejandro Grimaldo", pos:"LI", age:30, ca:160, pa:163, mv:35},
-  {name:"Jorge Domínguez", pos:"DFC", age:20, ca:128, pa:155, mv:8},
-  {name:"Dani Martínez", pos:"LI", age:21, ca:132, pa:158, mv:10},
-
-  // Mediocentro / Pivotes
-  {name:"Morten Hjulmand", pos:"PIV", age:26, ca:158, pa:168, mv:50},
-  {name:"Johnny Cardoso", pos:"PIV", age:24, ca:152, pa:165, mv:40},
-  {name:"Pablo Barrios", pos:"MC", age:23, ca:155, pa:172, mv:55},
-  {name:"Marcos Llorente", pos:"MD", age:31, ca:150, pa:152, mv:22},
-  {name:"Koke", pos:"MC", age:34, ca:142, pa:144, mv:5},
-  {name:"Obed Vargas", pos:"MC", age:20, ca:135, pa:165, mv:15},
-  {name:"Rodrigo Mendoza", pos:"MC", age:20, ca:130, pa:160, mv:9},
-
-  // Mediapuntas / Extremos
-  {name:"Álex Baena", pos:"MP", age:25, ca:160, pa:172, mv:55},
-  {name:"Kang-In Lee", pos:"MP", age:25, ca:158, pa:168, mv:45},
-  {name:"Thomas Lemar", pos:"MI", age:30, ca:148, pa:152, mv:18},
-  {name:"Ademola Lookman", pos:"EI", age:28, ca:162, pa:168, mv:50},
-  {name:"Giuliano Simeone", pos:"ED", age:23, ca:152, pa:170, mv:40},
-  {name:"Arnau Ortiz", pos:"ED", age:21, ca:130, pa:155, mv:8},
-
-  // Delanteros
-  {name:"Julián Álvarez", pos:"DC", age:26, ca:172, pa:180, mv:100},
-  {name:"Alexander Sørloth", pos:"DC", age:30, ca:158, pa:160, mv:35},
-  {name:"Carlos Martín", pos:"DC", age:24, ca:145, pa:162, mv:25}
-],
+    {name:"Jan Oblak",pos:"GK",age:33,ca:165,pa:168,mv:25},
+    {name:"Juan Musso",pos:"GK",age:32,ca:145,pa:148,mv:8},
+    {name:"Cristian Romero",pos:"DFC",age:28,ca:162,pa:168,mv:55},
+    {name:"Robin Le Normand",pos:"DFC",age:29,ca:158,pa:162,mv:45},
+    {name:"José María Giménez",pos:"DFC",age:31,ca:155,pa:158,mv:28},
+    {name:"Dávid Hancko",pos:"DFC",age:28,ca:155,pa:162,mv:40},
+    {name:"Marc Pubill",pos:"LD",age:23,ca:148,pa:168,mv:35},
+    {name:"Alejandro Grimaldo",pos:"LI",age:30,ca:160,pa:163,mv:35},
+    {name:"Jorge Domínguez",pos:"DFC",age:20,ca:128,pa:155,mv:8},
+    {name:"Dani Martínez",pos:"LI",age:21,ca:132,pa:158,mv:10},
+    {name:"Morten Hjulmand",pos:"PIV",age:26,ca:158,pa:168,mv:50},
+    {name:"Johnny Cardoso",pos:"PIV",age:24,ca:152,pa:165,mv:40},
+    {name:"Pablo Barrios",pos:"MC",age:23,ca:155,pa:172,mv:55},
+    {name:"Marcos Llorente",pos:"MD",age:31,ca:150,pa:152,mv:22},
+    {name:"Koke",pos:"MC",age:34,ca:142,pa:144,mv:5},
+    {name:"Obed Vargas",pos:"MC",age:20,ca:135,pa:165,mv:15},
+    {name:"Rodrigo Mendoza",pos:"MC",age:20,ca:130,pa:160,mv:9},
+    {name:"Álex Baena",pos:"MP",age:25,ca:160,pa:172,mv:55},
+    {name:"Kang-In Lee",pos:"MP",age:25,ca:158,pa:168,mv:45},
+    {name:"Thomas Lemar",pos:"MI",age:30,ca:148,pa:152,mv:18},
+    {name:"Ademola Lookman",pos:"EI",age:28,ca:162,pa:168,mv:50},
+    {name:"Giuliano Simeone",pos:"ED",age:23,ca:152,pa:170,mv:40},
+    {name:"Arnau Ortiz",pos:"ED",age:21,ca:130,pa:155,mv:8},
+    {name:"Julián Álvarez",pos:"DC",age:26,ca:172,pa:180,mv:100},
+    {name:"Alexander Sørloth",pos:"DC",age:30,ca:158,pa:160,mv:35},
+    {name:"Carlos Martín",pos:"DC",age:24,ca:145,pa:162,mv:25}
+  ],
   ath: [
     {name:"Nico Williams",pos:"EI",age:23,ca:165,pa:178,mv:70},
     {name:"Oihan Sancet",pos:"MP",age:26,ca:158,pa:168,mv:60},
@@ -642,644 +582,294 @@ const STAR_PLAYERS = {
 const FIRST_NAMES = ["Luka","Alejandro","Ferran","Rodri","Bruno","Phil","Martin","Federico","Rafael","João","Bernardo","Toni","Joshua","Jamal","Kai","Cole","Declan","Virgil","Ruben","William","Marc","Antonio","Theo","Achraf","Jules","Frenkie","Mason","Marcus","Raheem","Jack","James","Pablo","Hugo","Iñaki","Unai","Mikel","Oihan","Nico","Yeremy","Álex","Fermín","Dean","Arda","Pau"];
 const LAST_NAMES = ["García","Rodríguez","Martínez","López","González","Pérez","Sánchez","Ramírez","Torres","Flores","Silva","Costa","Santos","Fernandes","Carvalho","Castillo","Vargas","Reyes","Cruz","Molina","Herrera","Jiménez","Ruiz","Alonso","Navarro","Romero","Castro","Ramos","Vega","Méndez","Guerrero","Núñez","Rojas","Medina","Aguilar","Huijsen","Güler","Cubarsí","Bernal"];
 
-// Formaciones con posiciones específicas
 const FORMATIONS = {
-  "4-2-3-1":[
-    {x:50,y:88,pos:"GK"},
-    {x:18,y:70,pos:"LI"},{x:38,y:72,pos:"DFC"},{x:62,y:72,pos:"DFC"},{x:82,y:70,pos:"LD"},
-    {x:35,y:52,pos:"PIV"},{x:65,y:52,pos:"PIV"},
-    {x:18,y:35,pos:"EI"},{x:50,y:32,pos:"MP"},{x:82,y:35,pos:"ED"},
-    {x:50,y:14,pos:"DC"}
-  ],
-  "4-3-3":[
-    {x:50,y:88,pos:"GK"},
-    {x:18,y:70,pos:"LI"},{x:38,y:72,pos:"DFC"},{x:62,y:72,pos:"DFC"},{x:82,y:70,pos:"LD"},
-    {x:30,y:50,pos:"MC"},{x:50,y:48,pos:"PIV"},{x:70,y:50,pos:"MC"},
-    {x:20,y:22,pos:"EI"},{x:50,y:16,pos:"DC"},{x:80,y:22,pos:"ED"}
-  ],
-  "4-4-2":[
-    {x:50,y:88,pos:"GK"},
-    {x:18,y:70,pos:"LI"},{x:38,y:72,pos:"DFC"},{x:62,y:72,pos:"DFC"},{x:82,y:70,pos:"LD"},
-    {x:18,y:48,pos:"MI"},{x:38,y:50,pos:"MC"},{x:62,y:50,pos:"MC"},{x:82,y:48,pos:"MD"},
-    {x:38,y:18,pos:"DC"},{x:62,y:18,pos:"DC"}
-  ],
-  "3-5-2":[
-    {x:50,y:88,pos:"GK"},
-    {x:30,y:72,pos:"DFC"},{x:50,y:74,pos:"DFC"},{x:70,y:72,pos:"DFC"},
-    {x:12,y:48,pos:"CI"},{x:32,y:50,pos:"MC"},{x:50,y:46,pos:"PIV"},{x:68,y:50,pos:"MC"},{x:88,y:48,pos:"CD"},
-    {x:38,y:18,pos:"DC"},{x:62,y:18,pos:"DC"}
-  ],
-  "4-1-4-1":[
-    {x:50,y:88,pos:"GK"},
-    {x:18,y:70,pos:"LI"},{x:38,y:72,pos:"DFC"},{x:62,y:72,pos:"DFC"},{x:82,y:70,pos:"LD"},
-    {x:50,y:58,pos:"PIV"},
-    {x:18,y:40,pos:"MI"},{x:38,y:38,pos:"MC"},{x:62,y:38,pos:"MC"},{x:82,y:40,pos:"MD"},
-    {x:50,y:14,pos:"DC"}
-  ],
-  "5-3-2":[
-    {x:50,y:88,pos:"GK"},
-    {x:12,y:68,pos:"CI"},{x:30,y:72,pos:"DFC"},{x:50,y:74,pos:"DFC"},{x:70,y:72,pos:"DFC"},{x:88,y:68,pos:"CD"},
-    {x:30,y:46,pos:"MC"},{x:50,y:44,pos:"PIV"},{x:70,y:46,pos:"MC"},
-    {x:38,y:18,pos:"DC"},{x:62,y:18,pos:"DC"}
-  ]
+  "4-2-3-1":[{x:50,y:88,pos:"GK"},{x:18,y:70,pos:"LI"},{x:38,y:72,pos:"DFC"},{x:62,y:72,pos:"DFC"},{x:82,y:70,pos:"LD"},{x:35,y:52,pos:"PIV"},{x:65,y:52,pos:"PIV"},{x:18,y:35,pos:"EI"},{x:50,y:32,pos:"MP"},{x:82,y:35,pos:"ED"},{x:50,y:14,pos:"DC"}],
+  "4-3-3":[{x:50,y:88,pos:"GK"},{x:18,y:70,pos:"LI"},{x:38,y:72,pos:"DFC"},{x:62,y:72,pos:"DFC"},{x:82,y:70,pos:"LD"},{x:30,y:50,pos:"MC"},{x:50,y:48,pos:"PIV"},{x:70,y:50,pos:"MC"},{x:20,y:22,pos:"EI"},{x:50,y:16,pos:"DC"},{x:80,y:22,pos:"ED"}],
+  "4-4-2":[{x:50,y:88,pos:"GK"},{x:18,y:70,pos:"LI"},{x:38,y:72,pos:"DFC"},{x:62,y:72,pos:"DFC"},{x:82,y:70,pos:"LD"},{x:18,y:48,pos:"MI"},{x:38,y:50,pos:"MC"},{x:62,y:50,pos:"MC"},{x:82,y:48,pos:"MD"},{x:38,y:18,pos:"DC"},{x:62,y:18,pos:"DC"}],
+  "3-5-2":[{x:50,y:88,pos:"GK"},{x:30,y:72,pos:"DFC"},{x:50,y:74,pos:"DFC"},{x:70,y:72,pos:"DFC"},{x:12,y:48,pos:"CI"},{x:32,y:50,pos:"MC"},{x:50,y:46,pos:"PIV"},{x:68,y:50,pos:"MC"},{x:88,y:48,pos:"CD"},{x:38,y:18,pos:"DC"},{x:62,y:18,pos:"DC"}],
+  "4-1-4-1":[{x:50,y:88,pos:"GK"},{x:18,y:70,pos:"LI"},{x:38,y:72,pos:"DFC"},{x:62,y:72,pos:"DFC"},{x:82,y:70,pos:"LD"},{x:50,y:58,pos:"PIV"},{x:18,y:40,pos:"MI"},{x:38,y:38,pos:"MC"},{x:62,y:38,pos:"MC"},{x:82,y:40,pos:"MD"},{x:50,y:14,pos:"DC"}],
+  "5-3-2":[{x:50,y:88,pos:"GK"},{x:12,y:68,pos:"CI"},{x:30,y:72,pos:"DFC"},{x:50,y:74,pos:"DFC"},{x:70,y:72,pos:"DFC"},{x:88,y:68,pos:"CD"},{x:30,y:46,pos:"MC"},{x:50,y:44,pos:"PIV"},{x:70,y:46,pos:"MC"},{x:38,y:18,pos:"DC"},{x:62,y:18,pos:"DC"}]
 };
 
 const COPA_ROUNDS = ["Dieciseisavos","Octavos","Cuartos","Semifinales","Final"];
-
-// Orden de posiciones para ordenar la plantilla
-const POS_ORDER = {
-  GK:1,
-  LI:2, DFC:3, LD:4,
-  CI:5, PIV:6, CD:7,
-  MI:8, MC:9, MD:10,
-  EI:11, MP:12, ED:13,
-  DI:14, DC:15, DD:16
-};
-
-// Grupos para el filtro
-const POS_GROUPS = {
-  DEF: ["LI","DFC","LD"],
-  WB: ["CI","CD"],
-  MID: ["PIV","MI","MC","MD"],
-  ATT: ["EI","MP","ED","DI","DC","DD"]
-};
+const POS_ORDER = {GK:1,LI:2,DFC:3,LD:4,CI:5,PIV:6,CD:7,MI:8,MC:9,MD:10,EI:11,MP:12,ED:13,DI:14,DC:15,DD:16};
+const POS_GROUPS = {DEF:["LI","DFC","LD"],WB:["CI","CD"],MID:["PIV","MI","MC","MD"],ATT:["EI","MP","ED","DI","DC","DD"]};
 
 let state = {
-  userClubId: null,
-  season: "2025/26",
-  matchday: 1,
-  maxMatchdays: 38,
-  budget: 0,
-  morale: 75,
-  formation: "4-2-3-1",
-  mentality: "balanced",
-  style: "gegenpress",
-  pressing: 70,
-  defLine: "standard",
-  tempo: "standard",
-  players: [],
-  teams: {},
-  fixtures: [],
-  news: [],
-  inbox: [],
-  transferList: [],
-  matchPlayedThisMD: false,
-  trainingApplied: false,
-  selectedClubId: null,
-  copaRound: 0,
-  copaAlive: true,
-  copaBracket: [],
-  copaUserMatch: null,
-  copaPlayedThisRound: false,
-  squadSortBy: "ca",
-  squadSortDir: "desc",
-  lineup: Array(11).fill(null),
-  selectedSlot: null
+  userClubId:null, season:"2025/26", matchday:1, maxMatchdays:38, budget:0, morale:75,
+  formation:"4-2-3-1", mentality:"balanced", style:"gegenpress", pressing:70, defLine:"standard", tempo:"standard",
+  players:[], teams:{}, fixtures:[], news:[], inbox:[], transferList:[],
+  matchPlayedThisMD:false, trainingApplied:false, selectedClubId:null,
+  copaRound:0, copaAlive:true, copaBracket:[], copaUserMatch:null, copaPlayedThisRound:false,
+  squadSortBy:"ca", squadSortDir:"desc", lineup:Array(11).fill(null), selectedSlot:null
 };
 
-function rand(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
-function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
-function uuid(){ return Math.random().toString(36).slice(2,10); }
-function formatMoney(m){ if(m>=1000) return `€${(m/1000).toFixed(1)}M`; return `€${Math.round(m)}K`; }
-function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
+let currentPlayerId = null;
+
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function uuid(){return Math.random().toString(36).slice(2,10)}
+function formatMoney(m){if(m>=1000)return `€${(m/1000).toFixed(1)}M`;return `€${Math.round(m)}K`}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 
 function generatePlayer(pos, quality=70, name=null, mv=null){
   const age = rand(17,34);
   const ca = clamp(quality + rand(-8,8), 45, 95);
   const pa = clamp(ca + rand(0,15), ca, 99);
   const value = mv ? Math.round(mv*0.6 + rand(-5,10)) : Math.round(Math.pow(ca/50,3.2)*(38-age)*0.8);
-  
-  // Contrato: entre 1 y 5 años desde 2026
-  const contractYears = rand(1, 5);
-  const contractEnd = 2026 + contractYears;
-
+  const contractEnd = 2026 + rand(1,5);
   return {
-    id: uuid(),
-    name: name || `${pick(FIRST_NAMES)} ${pick(LAST_NAMES)}`,
-    pos, age, ca, pa,
-    condition: rand(85,100),
-    morale: rand(60,90),
-    value: Math.max(5, value),
-    wage: Math.round(value*0.012 + rand(5,40)),
-    injured: Math.random() < 0.04,
-    form: rand(5,9),
-    // Estadísticas
-    apps: 0, goals: 0, assists: 0, yellows: 0, reds: 0, motm: 0,
-    ratingSum: 0, avgRating: 0,
-    // Nuevo
-    contractEnd: contractEnd,
-    photo: null,          // dataURL o URL de la foto
-    history: []           // array de strings
+    id:uuid(), name: name || `${pick(FIRST_NAMES)} ${pick(LAST_NAMES)}`,
+    pos, age, ca, pa, condition:rand(85,100), morale:rand(60,90),
+    value:Math.max(5,value), wage:Math.round(value*0.012 + rand(5,40)),
+    injured:Math.random()<0.04, form:rand(5,9),
+    apps:0, goals:0, assists:0, yellows:0, reds:0, motm:0, ratingSum:0, avgRating:0,
+    contractEnd, photo:null, history:[]
   };
 }
 
 function generateSquad(clubId, strength){
   const squad = [];
   const stars = STAR_PLAYERS[clubId] || [];
-
-  // Añadir todos los jugadores estrella / plantilla definida
   stars.forEach(s => {
     const p = generatePlayer(s.pos, s.ca/2.05, s.name, s.mv);
     p.ca = clamp(Math.round(s.ca/2.05), 55, 95);
     p.pa = clamp(Math.round(s.pa/2.05), p.ca, 99);
     p.age = s.age;
-    p.value = Math.round(Math.pow(p.ca/50, 3.2) * (38 - p.age) * 1.3);
+    p.value = Math.round(Math.pow(p.ca/50,3.2)*(38-p.age)*1.3);
     squad.push(p);
   });
+  if(stars.length >= 18) return squad.sort((a,b)=>b.ca-a.ca);
 
-  // Si el equipo ya tiene una plantilla completa (≥ 18 jugadores), no añadir rellenos
-  if (stars.length >= 18) {
-    return squad.sort((a, b) => b.ca - a.ca);
-  }
-
-  // --- Solo para equipos con plantilla incompleta ---
-  const needed = {
-    GK: 2,
-    LI: 2, DFC: 4, LD: 2,
-    CI: 1, CD: 1,
-    PIV: 2, MI: 1, MC: 3, MD: 1,
-    EI: 2, MP: 2, ED: 2,
-    DI: 1, DC: 2, DD: 1
-  };
-
-  // Restar los jugadores que ya tenemos
-  stars.forEach(s => {
-    if (needed[s.pos] !== undefined) {
-      needed[s.pos] = Math.max(0, needed[s.pos] - 1);
-    }
-  });
-
-  // Generar los que faltan
-  Object.entries(needed).forEach(([pos, n]) => {
-    for (let i = 0; i < n; i++) {
-      squad.push(generatePlayer(pos, strength - rand(0, 15)));
-    }
-  });
-
-  return squad.sort((a, b) => b.ca - a.ca);
+  const needed = {GK:2,LI:2,DFC:4,LD:2,CI:1,CD:1,PIV:2,MI:1,MC:3,MD:1,EI:2,MP:2,ED:2,DI:1,DC:2,DD:1};
+  stars.forEach(s => { if(needed[s.pos]!==undefined) needed[s.pos]=Math.max(0,needed[s.pos]-1); });
+  Object.entries(needed).forEach(([pos,n])=>{ for(let i=0;i<n;i++) squad.push(generatePlayer(pos, strength-rand(0,15))); });
+  return squad.sort((a,b)=>b.ca-a.ca);
 }
 
 function initTeams(){
-  CLUBS.forEach(c => {
-    state.teams[c.id] = {
-      ...c,
-      players: generateSquad(c.id, c.strength),
-      played:0, won:0, drawn:0, lost:0, gf:0, ga:0, pts:0, form:[]
-    };
+  CLUBS.forEach(c=>{
+    state.teams[c.id]={...c, players:generateSquad(c.id,c.strength), played:0,won:0,drawn:0,lost:0,gf:0,ga:0,pts:0,form:[]};
   });
 }
 
 function generateFixtures(){
-  const ids = CLUBS.map(c => c.id);
-  const fixtures = [];
-  for(let md=1; md<=38; md++){
-    const round = [];
-    const shuffled = [...ids].sort(() => Math.random()-0.5);
-    for(let i=0; i<shuffled.length; i+=2){
-      if(shuffled[i+1]) round.push({home: shuffled[i], away: shuffled[i+1], md});
-    }
+  const ids=CLUBS.map(c=>c.id); const fixtures=[];
+  for(let md=1;md<=38;md++){
+    const round=[], shuffled=[...ids].sort(()=>Math.random()-0.5);
+    for(let i=0;i<shuffled.length;i+=2) if(shuffled[i+1]) round.push({home:shuffled[i],away:shuffled[i+1],md});
     fixtures.push(round);
   }
-  state.fixtures = fixtures;
+  state.fixtures=fixtures;
 }
 
 function generateTransferList(){
-  const list = [];
-  const positions = ["GK","LI","DFC","LD","CI","PIV","CD","MI","MC","MD","EI","MP","ED","DI","DC","DD"];
-  const clubs = ["Ajax","Benfica","Porto","Dortmund","Leverkusen","Napoli","Milan","Lazio","Brighton","Atalanta","Lille","Monaco","Sporting","Feyenoord","RB Leipzig","PSV","Braga","Frankfurt","Wolfsburg","Nice"];
-  for(let i=0; i<30; i++){
-    const pos = pick(positions);
-    const ca = rand(68,90);
-    list.push({...generatePlayer(pos, ca), club: pick(clubs)});
-  }
-  state.transferList = list.sort((a,b) => b.ca - a.ca);
+  const list=[], positions=["GK","LI","DFC","LD","CI","PIV","CD","MI","MC","MD","EI","MP","ED","DI","DC","DD"];
+  const clubs=["Ajax","Benfica","Porto","Dortmund","Leverkusen","Napoli","Milan","Lazio","Brighton","Atalanta","Lille","Monaco","Sporting","Feyenoord","RB Leipzig","PSV","Braga","Frankfurt","Wolfsburg","Nice"];
+  for(let i=0;i<30;i++){ const pos=pick(positions); list.push({...generatePlayer(pos,rand(68,90)),club:pick(clubs)}); }
+  state.transferList=list.sort((a,b)=>b.ca-a.ca);
 }
 
 function initCopa(){
-  const ligaIds = CLUBS.map(c => c.id);
-  const modestos = ["Racing Santander","Sporting Gijón","Albacete","Burgos","Eibar","Huesca","Leganés","Zaragoza","Tenerife","Cartagena","Mirandés","Eldense"];
-  const all = [...ligaIds];
-  modestos.forEach((n,i) => {
-    const id = "mod"+i;
-    state.teams[id] = {
-      id, name: n, short: n.slice(0,3).toUpperCase(),
-      strength: rand(55,68), manager: "—", players: [],
-      played:0, won:0, drawn:0, lost:0, gf:0, ga:0, pts:0, form: [], rating: rand(60,70)
-    };
+  const ligaIds=CLUBS.map(c=>c.id);
+  const modestos=["Racing Santander","Sporting Gijón","Albacete","Burgos","Eibar","Huesca","Leganés","Zaragoza","Tenerife","Cartagena","Mirandés","Eldense"];
+  const all=[...ligaIds];
+  modestos.forEach((n,i)=>{
+    const id="mod"+i;
+    state.teams[id]={id,name:n,short:n.slice(0,3).toUpperCase(),strength:rand(55,68),manager:"—",players:[],played:0,won:0,drawn:0,lost:0,gf:0,ga:0,pts:0,form:[],rating:rand(60,70)};
     all.push(id);
   });
-  const shuffled = all.sort(() => Math.random()-0.5).slice(0,32);
-  const bracket = [];
-  for(let i=0; i<shuffled.length; i+=2){
-    bracket.push({home: shuffled[i], away: shuffled[i+1], played: false, hg: null, ag: null});
-  }
-  state.copaBracket = bracket;
-  state.copaRound = 0;
-  state.copaAlive = true;
-  state.copaUserMatch = bracket.find(m => m.home === state.userClubId || m.away === state.userClubId) || null;
-  state.copaPlayedThisRound = false;
+  const shuffled=all.sort(()=>Math.random()-0.5).slice(0,32);
+  const bracket=[];
+  for(let i=0;i<shuffled.length;i+=2) bracket.push({home:shuffled[i],away:shuffled[i+1],played:false,hg:null,ag:null});
+  state.copaBracket=bracket; state.copaRound=0; state.copaAlive=true;
+  state.copaUserMatch=bracket.find(m=>m.home===state.userClubId||m.away===state.userClubId)||null;
+  state.copaPlayedThisRound=false;
 }
 
 function autoSelectLineup(){
-  const slots = FORMATIONS[state.formation] || FORMATIONS["4-2-3-1"];
-  const available = state.players.filter(p => !p.injured).sort((a,b) => b.ca - a.ca);
-  const used = new Set();
-  state.lineup = slots.map(slot => {
-    // 1º intentar posición exacta
-    let p = available.find(pl => pl.pos === slot.pos && !used.has(pl.id));
-    // 2º intentar grupo similar
-    if(!p){
-      const group = Object.entries(POS_GROUPS).find(([k,v]) => v.includes(slot.pos));
-      if(group){
-        p = available.find(pl => group[1].includes(pl.pos) && !used.has(pl.id));
-      }
-    }
-    // 3º cualquier jugador
-    if(!p) p = available.find(pl => !used.has(pl.id));
-    if(p){ used.add(p.id); return p.id; }
-    return null;
+  const slots=FORMATIONS[state.formation]||FORMATIONS["4-2-3-1"];
+  const available=state.players.filter(p=>!p.injured).sort((a,b)=>b.ca-a.ca);
+  const used=new Set();
+  state.lineup=slots.map(slot=>{
+    let p=available.find(pl=>pl.pos===slot.pos&&!used.has(pl.id));
+    if(!p){ const group=Object.entries(POS_GROUPS).find(([k,v])=>v.includes(slot.pos)); if(group) p=available.find(pl=>group[1].includes(pl.pos)&&!used.has(pl.id)); }
+    if(!p) p=available.find(pl=>!used.has(pl.id));
+    if(p){used.add(p.id);return p.id;} return null;
   });
-  state.selectedSlot = null;
-  renderPitch();
-  renderLineupPlayers();
+  state.selectedSlot=null; renderPitch(); renderLineupPlayers();
 }
 
-function clearLineup(){
-  state.lineup = Array(11).fill(null);
-  state.selectedSlot = null;
-  renderPitch();
-  renderLineupPlayers();
-}
+function clearLineup(){ state.lineup=Array(11).fill(null); state.selectedSlot=null; renderPitch(); renderLineupPlayers(); }
 
-function calcTeamStrength(teamId, isUser = false) {
-  const team = state.teams[teamId];
-  if (!team) return 55;
-  if (teamId.startsWith("mod")) return team.strength + rand(-4, 4);
-
+function calcTeamStrength(teamId, isUser=false){
+  const team=state.teams[teamId]; if(!team) return 55;
+  if(teamId.startsWith("mod")) return team.strength+rand(-4,4);
   let players;
-  if (isUser && state.lineup && state.lineup.some(id => id)) {
-    players = state.lineup
-      .map(id => id ? state.players.find(p => p.id === id) : null)
-      .filter(p => p && !p.injured);
-    if (players.length < 8) {
-      players = team.players.filter(p => !p.injured).slice(0, 11);
-    }
-  } else {
-    players = team.players.filter(p => !p.injured).slice(0, 11);
+  if(isUser&&state.lineup&&state.lineup.some(id=>id)){
+    players=state.lineup.map(id=>id?state.players.find(p=>p.id===id):null).filter(p=>p&&!p.injured);
+    if(players.length<8) players=team.players.filter(p=>!p.injured).slice(0,11);
+  } else players=team.players.filter(p=>!p.injured).slice(0,11);
+  if(players.length<8) return team.strength*0.65;
+  let total=0;
+  players.forEach(p=>{ total += p.ca * (0.70+(p.condition/100)*0.30) * (0.85+(p.form/10)*0.30); });
+  let avg=total/players.length;
+  if(isUser){
+    avg += (state.morale-70)*0.08;
+    const mentMod={defensive:-2.8,cautious:-1.4,balanced:0,positive:1.6,attacking:3.2}[state.mentality]||0;
+    const styleMod={possession:1.2,counter:0.8,direct:0.3,gegenpress:1.8,tiki:1.5}[state.style]||0;
+    avg += mentMod + styleMod + (state.pressing-55)/35;
   }
-
-  if (players.length < 8) return team.strength * 0.65;
-
-  // Media ponderada por condición y forma
-  let total = 0;
-  players.forEach(p => {
-    const condFactor = 0.70 + (p.condition / 100) * 0.30; // condición influye menos extremo
-    const formFactor = 0.85 + (p.form / 10) * 0.30;
-    total += p.ca * condFactor * formFactor;
-  });
-
-  let avg = total / players.length;
-
-  // Bonus de moral del equipo (solo usuario)
-  if (isUser) {
-    avg += (state.morale - 70) * 0.08;
-  }
-
-  // Influencia táctica (solo usuario)
-  if (isUser) {
-    const mentMod = {
-      defensive: -2.8,
-      cautious: -1.4,
-      balanced: 0,
-      positive: 1.6,
-      attacking: 3.2
-    }[state.mentality] || 0;
-
-    const styleMod = {
-      possession: 1.2,
-      counter: 0.8,
-      direct: 0.3,
-      gegenpress: 1.8,
-      tiki: 1.5
-    }[state.style] || 0;
-
-    // Pressing alto cansa más pero da más intensidad
-    const pressMod = (state.pressing - 55) / 35;
-
-    avg += mentMod + styleMod + pressMod;
-  }
-
-  // Límite realista
-  return clamp(avg, 48, 94);
+  return clamp(avg,48,94);
 }
 
-function simulateMatch(homeId, awayId) {
-  const homeStr = calcTeamStrength(homeId, homeId === state.userClubId);
-  const awayStr = calcTeamStrength(awayId, awayId === state.userClubId);
+function simulateMatch(homeId, awayId){
+  const homeStr=calcTeamStrength(homeId, homeId===state.userClubId);
+  const awayStr=calcTeamStrength(awayId, awayId===state.userClubId);
+  let hExp=1.15+(homeStr-70)*0.038+0.38;
+  let aExp=1.05+(awayStr-70)*0.036;
+  const diff=homeStr-awayStr;
+  if(diff>12){hExp+=(diff-12)*0.045;aExp-=(diff-12)*0.025;}
+  else if(diff<-12){aExp+=(-diff-12)*0.045;hExp-=(-diff-12)*0.025;}
+  if(homeId===state.userClubId){ if(state.mentality==="attacking"){hExp+=0.28;aExp+=0.12;} if(state.mentality==="defensive"){hExp-=0.22;aExp-=0.18;} }
+  if(awayId===state.userClubId){ if(state.mentality==="attacking"){aExp+=0.28;hExp+=0.12;} if(state.mentality==="defensive"){aExp-=0.22;hExp-=0.18;} }
+  hExp=clamp(hExp,0.35,3.4); aExp=clamp(aExp,0.30,3.2);
 
-  const homeAdv = 0.38;
-  let hExp = 1.15 + (homeStr - 70) * 0.038 + homeAdv;
-  let aExp = 1.05 + (awayStr - 70) * 0.036;
-
-  const diff = homeStr - awayStr;
-  if (diff > 12) {
-    hExp += (diff - 12) * 0.045;
-    aExp -= (diff - 12) * 0.025;
-  } else if (diff < -12) {
-    aExp += (-diff - 12) * 0.045;
-    hExp -= (-diff - 12) * 0.025;
+  function generateGoals(exp){
+    const r=Math.random();
+    if(exp<0.7){if(r<0.52)return 0;if(r<0.88)return 1;return 2;}
+    if(exp<1.15){if(r<0.32)return 0;if(r<0.72)return 1;if(r<0.93)return 2;return 3;}
+    if(exp<1.7){if(r<0.18)return 0;if(r<0.52)return 1;if(r<0.82)return 2;if(r<0.95)return 3;return 4;}
+    if(exp<2.3){if(r<0.10)return 0;if(r<0.35)return 1;if(r<0.65)return 2;if(r<0.87)return 3;if(r<0.97)return 4;return 5;}
+    if(r<0.06)return 0;if(r<0.22)return 1;if(r<0.48)return 2;if(r<0.75)return 3;if(r<0.92)return 4;return 5+(Math.random()<0.35?1:0);
   }
+  let hg=generateGoals(hExp), ag=generateGoals(aExp);
+  if(hg+ag>=6&&Math.random()<0.55){ if(hg>ag)hg--; else if(ag>hg)ag--; else if(Math.random()<0.5)hg--; else ag--; }
 
-  if (homeId === state.userClubId) {
-    if (state.mentality === "attacking") { hExp += 0.28; aExp += 0.12; }
-    if (state.mentality === "defensive") { hExp -= 0.22; aExp -= 0.18; }
+  const events=[]; const homeName=state.teams[homeId]?.name||homeId; const awayName=state.teams[awayId]?.name||awayId;
+  function getMatchPlayers(teamId){
+    if(teamId===state.userClubId&&state.lineup.some(id=>id)) return state.lineup.map(id=>id?state.players.find(p=>p.id===id):null).filter(p=>p&&!p.injured);
+    return (state.teams[teamId]?.players||[]).filter(p=>!p.injured);
   }
-  if (awayId === state.userClubId) {
-    if (state.mentality === "attacking") { aExp += 0.28; hExp += 0.12; }
-    if (state.mentality === "defensive") { aExp -= 0.22; hExp -= 0.18; }
-  }
+  const homePlayers=getMatchPlayers(homeId), awayPlayers=getMatchPlayers(awayId);
+  const attackPos=["DC","DI","DD","EI","ED","MP"], midPos=["MC","MI","MD","PIV","CI","CD"];
 
-  hExp = clamp(hExp, 0.35, 3.4);
-  aExp = clamp(aExp, 0.30, 3.2);
-
-  function generateGoals(exp) {
-    const r = Math.random();
-    if (exp < 0.7) {
-      if (r < 0.52) return 0;
-      if (r < 0.88) return 1;
-      return 2;
-    }
-    if (exp < 1.15) {
-      if (r < 0.32) return 0;
-      if (r < 0.72) return 1;
-      if (r < 0.93) return 2;
-      return 3;
-    }
-    if (exp < 1.7) {
-      if (r < 0.18) return 0;
-      if (r < 0.52) return 1;
-      if (r < 0.82) return 2;
-      if (r < 0.95) return 3;
-      return 4;
-    }
-    if (exp < 2.3) {
-      if (r < 0.10) return 0;
-      if (r < 0.35) return 1;
-      if (r < 0.65) return 2;
-      if (r < 0.87) return 3;
-      if (r < 0.97) return 4;
-      return 5;
-    }
-    if (r < 0.06) return 0;
-    if (r < 0.22) return 1;
-    if (r < 0.48) return 2;
-    if (r < 0.75) return 3;
-    if (r < 0.92) return 4;
-    return 5 + (Math.random() < 0.35 ? 1 : 0);
-  }
-
-  let hg = generateGoals(hExp);
-  let ag = generateGoals(aExp);
-
-  if (hg + ag >= 6 && Math.random() < 0.55) {
-    if (hg > ag) hg--;
-    else if (ag > hg) ag--;
-    else if (Math.random() < 0.5) hg--;
-    else ag--;
-  }
-
-  const events = [];
-  const homeName = state.teams[homeId]?.name || homeId;
-  const awayName = state.teams[awayId]?.name || awayId;
-
-  function getMatchPlayers(teamId) {
-    if (teamId === state.userClubId && state.lineup.some(id => id)) {
-      return state.lineup
-        .map(id => id ? state.players.find(p => p.id === id) : null)
-        .filter(p => p && !p.injured);
-    }
-    return (state.teams[teamId]?.players || []).filter(p => !p.injured);
-  }
-
-  const homePlayers = getMatchPlayers(homeId);
-  const awayPlayers = getMatchPlayers(awayId);
-
-  const attackPos = ["DC", "DI", "DD", "EI", "ED", "MP"];
-  const midPos = ["MC", "MI", "MD", "PIV", "CI", "CD"];
-
-  // --- Actualizar partidos jugados y nota base ---
-  function updateAppsAndRating(players, goalsFor, goalsAgainst, isHome) {
-    players.forEach(p => {
-      p.apps = (p.apps || 0) + 1;
-
-      // Nota base según resultado
-      let rating = 6.3 + Math.random() * 0.8;
-      if (goalsFor > goalsAgainst) rating += 0.6 + Math.random() * 0.5;
-      else if (goalsFor === goalsAgainst) rating += 0.15;
-      else rating -= 0.4 + Math.random() * 0.5;
-
-      // Bonus por calidad
-      rating += (p.ca - 140) * 0.008;
-      rating = clamp(rating, 5.0, 9.7);
-
-      p.ratingSum = (p.ratingSum || 0) + rating;
-      p.avgRating = p.apps > 0 ? (p.ratingSum / p.apps) : 0;
-      p._lastRating = rating; // temporal para elegir MVP
+  function updateAppsAndRating(players, goalsFor, goalsAgainst){
+    players.forEach(p=>{
+      p.apps=(p.apps||0)+1;
+      let rating=6.3+Math.random()*0.8;
+      if(goalsFor>goalsAgainst) rating+=0.6+Math.random()*0.5;
+      else if(goalsFor===goalsAgainst) rating+=0.15;
+      else rating-=0.4+Math.random()*0.5;
+      rating+= (p.ca-140)*0.008;
+      rating=clamp(rating,5.0,9.7);
+      p.ratingSum=(p.ratingSum||0)+rating;
+      p.avgRating=p.apps>0?(p.ratingSum/p.apps):0;
+      p._lastRating=rating;
     });
   }
+  updateAppsAndRating(homePlayers,hg,ag);
+  updateAppsAndRating(awayPlayers,ag,hg);
 
-  updateAppsAndRating(homePlayers, hg, ag, true);
-  updateAppsAndRating(awayPlayers, ag, hg, false);
-
-  // --- Goles y asistencias ---
-  const goalMinutes = [];
-  for (let i = 0; i < hg + ag; i++) goalMinutes.push(rand(4, 93));
-  goalMinutes.sort((a, b) => a - b);
-
-  let hs = 0, as_ = 0;
-  goalMinutes.forEach(min => {
-    const homeScores = (hs < hg) && (as_ >= ag || Math.random() < 0.52);
-
-    if (homeScores && hs < hg) {
-      let pool = homePlayers.filter(p => attackPos.includes(p.pos));
-      if (pool.length === 0) pool = homePlayers.filter(p => midPos.includes(p.pos));
-      if (pool.length === 0) pool = homePlayers;
-      const scorer = pool.length ? pick(pool) : null;
-
-      if (scorer) {
-        scorer.goals = (scorer.goals || 0) + 1;
-        scorer._lastRating = Math.min(9.8, (scorer._lastRating || 6.5) + 1.1);
-        events.push({ min, type: "goal", text: `⚽ GOL! ${scorer.name} (${homeName})` });
-
-        // Asistencia (60% de probabilidad)
-        if (Math.random() < 0.60 && homePlayers.length > 1) {
-          const assisters = homePlayers.filter(p => p.id !== scorer.id);
-          const assister = pick(assisters);
-          assister.assists = (assister.assists || 0) + 1;
-          assister._lastRating = Math.min(9.5, (assister._lastRating || 6.5) + 0.5);
-        }
+  const goalMinutes=[]; for(let i=0;i<hg+ag;i++) goalMinutes.push(rand(4,93)); goalMinutes.sort((a,b)=>a-b);
+  let hs=0, as_=0;
+  goalMinutes.forEach(min=>{
+    const homeScores=(hs<hg)&&(as_>=ag||Math.random()<0.52);
+    if(homeScores&&hs<hg){
+      let pool=homePlayers.filter(p=>attackPos.includes(p.pos)); if(!pool.length) pool=homePlayers.filter(p=>midPos.includes(p.pos)); if(!pool.length) pool=homePlayers;
+      const scorer=pool.length?pick(pool):null;
+      if(scorer){
+        scorer.goals=(scorer.goals||0)+1; scorer._lastRating=Math.min(9.8,(scorer._lastRating||6.5)+1.1);
+        if(!scorer.history) scorer.history=[]; scorer.history.unshift(`Gol en Jornada ${state.matchday}`); if(scorer.history.length>12) scorer.history.pop();
+        events.push({min,type:"goal",text:`⚽ GOL! ${scorer.name} (${homeName})`});
+        if(Math.random()<0.60&&homePlayers.length>1){ const assister=pick(homePlayers.filter(p=>p.id!==scorer.id)); assister.assists=(assister.assists||0)+1; assister._lastRating=Math.min(9.5,(assister._lastRating||6.5)+0.5); }
       }
       hs++;
-    } else if (as_ < ag) {
-      let pool = awayPlayers.filter(p => attackPos.includes(p.pos));
-      if (pool.length === 0) pool = awayPlayers.filter(p => midPos.includes(p.pos));
-      if (pool.length === 0) pool = awayPlayers;
-      const scorer = pool.length ? pick(pool) : null;
-
-      if (scorer) {
-        scorer.goals = (scorer.goals || 0) + 1;
-        scorer._lastRating = Math.min(9.8, (scorer._lastRating || 6.5) + 1.1);
-        events.push({ min, type: "goal", text: `⚽ GOL! ${scorer.name} (${awayName})` });
-
-        if (Math.random() < 0.60 && awayPlayers.length > 1) {
-          const assisters = awayPlayers.filter(p => p.id !== scorer.id);
-          const assister = pick(assisters);
-          assister.assists = (assister.assists || 0) + 1;
-          assister._lastRating = Math.min(9.5, (assister._lastRating || 6.5) + 0.5);
-        }
+    } else if(as_<ag){
+      let pool=awayPlayers.filter(p=>attackPos.includes(p.pos)); if(!pool.length) pool=awayPlayers.filter(p=>midPos.includes(p.pos)); if(!pool.length) pool=awayPlayers;
+      const scorer=pool.length?pick(pool):null;
+      if(scorer){
+        scorer.goals=(scorer.goals||0)+1; scorer._lastRating=Math.min(9.8,(scorer._lastRating||6.5)+1.1);
+        events.push({min,type:"goal",text:`⚽ GOL! ${scorer.name} (${awayName})`});
+        if(Math.random()<0.60&&awayPlayers.length>1){ const assister=pick(awayPlayers.filter(p=>p.id!==scorer.id)); assister.assists=(assister.assists||0)+1; assister._lastRating=Math.min(9.5,(assister._lastRating||6.5)+0.5); }
       }
       as_++;
     }
   });
 
-  // --- Tarjetas ---
-  const numCards = rand(1, 4);
-  for (let i = 0; i < numCards; i++) {
-    const min = rand(12, 90);
-    const isHome = Math.random() < 0.5;
-    const pl = isHome ? homePlayers : awayPlayers;
-    const teamName = isHome ? homeName : awayName;
-    const p = pl.length ? pick(pl) : null;
-    if (!p) continue;
-
-    if (Math.random() < 0.88) {
-      p.yellows = (p.yellows || 0) + 1;
-      p._lastRating = Math.max(5.0, (p._lastRating || 6.5) - 0.4);
-      events.push({ min, type: "card-y", text: `🟨 ${p.name} (${teamName})` });
-    } else {
-      p.reds = (p.reds || 0) + 1;
-      p._lastRating = Math.max(4.5, (p._lastRating || 6.5) - 1.5);
-      events.push({ min, type: "card-r", text: `🟥 ¡Roja! ${p.name} (${teamName})` });
-    }
+  for(let i=0;i<rand(1,4);i++){
+    const min=rand(12,90), isHome=Math.random()<0.5, pl=isHome?homePlayers:awayPlayers, teamName=isHome?homeName:awayName, p=pl.length?pick(pl):null;
+    if(!p) continue;
+    if(Math.random()<0.88){ p.yellows=(p.yellows||0)+1; p._lastRating=Math.max(5,(p._lastRating||6.5)-0.4); events.push({min,type:"card-y",text:`🟨 ${p.name} (${teamName})`}); }
+    else { p.reds=(p.reds||0)+1; p._lastRating=Math.max(4.5,(p._lastRating||6.5)-1.5); events.push({min,type:"card-r",text:`🟥 ¡Roja! ${p.name} (${teamName})`}); }
   }
 
-  // --- MVP del partido ---
-  const allPlayers = [...homePlayers, ...awayPlayers];
-  if (allPlayers.length > 0) {
-    allPlayers.sort((a, b) => (b._lastRating || 0) - (a._lastRating || 0));
-    const motm = allPlayers[0];
-    if (motm) {
-      motm.motm = (motm.motm || 0) + 1;
-      motm._lastRating = Math.min(9.9, (motm._lastRating || 7) + 0.3);
-    }
-  }
+  const allPlayers=[...homePlayers,...awayPlayers];
+  if(allPlayers.length){ allPlayers.sort((a,b)=>(b._lastRating||0)-(a._lastRating||0)); const motm=allPlayers[0]; if(motm){ motm.motm=(motm.motm||0)+1; motm._lastRating=Math.min(9.9,(motm._lastRating||7)+0.3); } }
+  [...homePlayers,...awayPlayers].forEach(p=>{ if(p._lastRating){ p.ratingSum=(p.ratingSum||0)-(p.avgRating||6.5)+p._lastRating; p.avgRating=p.apps>0?(p.ratingSum/p.apps):0; delete p._lastRating; } });
 
-  // Recalcular media de rating después de los bonus
-  [...homePlayers, ...awayPlayers].forEach(p => {
-    if (p._lastRating) {
-      // Re-ajustar el ratingSum con el rating final
-      p.ratingSum = (p.ratingSum || 0) - (p.avgRating || 6.5) + p._lastRating;
-      p.avgRating = p.apps > 0 ? (p.ratingSum / p.apps) : 0;
-      delete p._lastRating;
-    }
-  });
-
-  events.sort((a, b) => a.min - b.min);
-  return { homeGoals: hg, awayGoals: ag, events };
+  events.sort((a,b)=>a.min-b.min);
+  return {homeGoals:hg, awayGoals:ag, events};
 }
 
 function applyResult(homeId, awayId, hg, ag){
-  const home = state.teams[homeId];
-  const away = state.teams[awayId];
-  if(!home || !away || homeId.startsWith("mod") || awayId.startsWith("mod")) return;
-
-  home.played++; away.played++;
-  home.gf += hg; home.ga += ag;
-  away.gf += ag; away.ga += hg;
-
-  if(hg > ag){
-    home.won++; home.pts += 3; home.form.unshift("W");
-    away.lost++; away.form.unshift("L");
-  } else if(hg < ag){
-    away.won++; away.pts += 3; away.form.unshift("W");
-    home.lost++; home.form.unshift("L");
-  } else {
-    home.drawn++; away.drawn++;
-    home.pts++; away.pts++;
-    home.form.unshift("D"); away.form.unshift("D");
-  }
-  home.form = home.form.slice(0,5);
-  away.form = away.form.slice(0,5);
-
-  if(homeId === state.userClubId || awayId === state.userClubId){
-    const won = (homeId === state.userClubId && hg > ag) || (awayId === state.userClubId && ag > hg);
-    if(won) state.morale = clamp(state.morale + rand(3,8), 20, 100);
-    else if(hg === ag) state.morale = clamp(state.morale + rand(-2,3), 20, 100);
-    else state.morale = clamp(state.morale - rand(4,10), 20, 100);
+  const home=state.teams[homeId], away=state.teams[awayId];
+  if(!home||!away||homeId.startsWith("mod")||awayId.startsWith("mod")) return;
+  home.played++; away.played++; home.gf+=hg; home.ga+=ag; away.gf+=ag; away.ga+=hg;
+  if(hg>ag){ home.won++; home.pts+=3; home.form.unshift("W"); away.lost++; away.form.unshift("L"); }
+  else if(hg<ag){ away.won++; away.pts+=3; away.form.unshift("W"); home.lost++; home.form.unshift("L"); }
+  else { home.drawn++; away.drawn++; home.pts++; away.pts++; home.form.unshift("D"); away.form.unshift("D"); }
+  home.form=home.form.slice(0,5); away.form=away.form.slice(0,5);
+  if(homeId===state.userClubId||awayId===state.userClubId){
+    const won=(homeId===state.userClubId&&hg>ag)||(awayId===state.userClubId&&ag>hg);
+    if(won) state.morale=clamp(state.morale+rand(3,8),20,100);
+    else if(hg===ag) state.morale=clamp(state.morale+rand(-2,3),20,100);
+    else state.morale=clamp(state.morale-rand(4,10),20,100);
   }
 }
 
 function updateHeader(){
-  const club = state.teams[state.userClubId];
-  if(!club) return;
-  document.getElementById("hdr-club").textContent = club.name;
-  document.getElementById("hdr-manager").textContent = club.manager;
-  document.getElementById("hdr-season").textContent = state.season;
-  document.getElementById("hdr-matchday").textContent = state.matchday;
-  document.getElementById("hdr-budget").textContent = formatMoney(state.budget * 1000);
-  document.getElementById("hdr-morale").textContent = state.morale + "%";
+  const club=state.teams[state.userClubId]; if(!club) return;
+  document.getElementById("hdr-club").textContent=club.name;
+  document.getElementById("hdr-manager").textContent=club.manager;
+  document.getElementById("hdr-season").textContent=state.season;
+  document.getElementById("hdr-matchday").textContent=state.matchday;
+  document.getElementById("hdr-budget").textContent=formatMoney(state.budget*1000);
+  document.getElementById("hdr-morale").textContent=state.morale+"%";
 }
 
 function renderDashboard(){
-  const club = state.teams[state.userClubId];
-  const sorted = Object.values(state.teams).filter(t => !t.id.startsWith("mod")).sort((a,b) => b.pts - a.pts || (b.gf-b.ga) - (a.gf-a.ga));
-  document.getElementById("dash-pos").textContent = (sorted.findIndex(t => t.id === state.userClubId) + 1) + "º";
-  document.getElementById("dash-pts").textContent = club.pts;
-  document.getElementById("dash-form").innerHTML = club.form.map(f => `<span class="${f}">${f}</span>`).join("") || "—";
-  document.getElementById("dash-manager").textContent = club.manager;
-
-  const md = state.fixtures[state.matchday-1] || [];
-  const next = md.find(f => f.home === state.userClubId || f.away === state.userClubId);
-  const el = document.getElementById("next-match");
-  if(next && !state.matchPlayedThisMD){
-    const isHome = next.home === state.userClubId;
-    const opp = state.teams[isHome ? next.away : next.home];
-    el.innerHTML = `<div style="font-size:1.05rem;font-weight:700">${isHome ? "Local vs" : "Visitante vs"} ${opp.name}</div>
-                    <div style="color:var(--muted);margin-top:4px">Jornada ${state.matchday} · ${opp.manager} · Rating ${opp.rating}</div>`;
-  } else if(state.matchday > state.maxMatchdays){
-    el.innerHTML = `<div style="font-weight:700">¡Temporada de liga finalizada!</div>`;
-  } else {
-    el.innerHTML = `<div>Partido de liga ya jugado. Continúa a la siguiente jornada.</div>`;
-  }
-
-  const copaEl = document.getElementById("next-copa");
-  if(!state.copaAlive){
-    copaEl.innerHTML = `<div style="font-weight:700;color:var(--loss)">Eliminado de la Copa del Rey</div>`;
-  } else if(state.copaRound >= COPA_ROUNDS.length){
-    copaEl.innerHTML = `<div style="font-weight:700;color:var(--win)">¡Campeón de la Copa del Rey!</div>`;
-  } else if(state.copaUserMatch && !state.copaPlayedThisRound){
-    const m = state.copaUserMatch;
-    const isHome = m.home === state.userClubId;
-    const opp = state.teams[isHome ? m.away : m.home];
-    copaEl.innerHTML = `<div style="font-weight:700">Copa del Rey · ${COPA_ROUNDS[state.copaRound]}</div>
-                        <div style="margin-top:4px">${isHome ? "Local vs" : "Visitante vs"} ${opp ? opp.name : m.away}</div>`;
-  } else {
-    copaEl.innerHTML = `<div style="color:var(--muted)">Copa del Rey: ${COPA_ROUNDS[state.copaRound] || "Finalizada"}</div>`;
-  }
-
-  document.getElementById("news-feed").innerHTML = state.news.slice(0,6).map(n => 
-    `<div class="news-item"><div class="date">${n.date}</div><div>${n.text}</div></div>`
-  ).join("") || "<div style='color:var(--muted)'>Sin noticias.</div>";
+  const club=state.teams[state.userClubId];
+  const sorted=Object.values(state.teams).filter(t=>!t.id.startsWith("mod")).sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));
+  document.getElementById("dash-pos").textContent=(sorted.findIndex(t=>t.id===state.userClubId)+1)+"º";
+  document.getElementById("dash-pts").textContent=club.pts;
+  document.getElementById("dash-form").innerHTML=club.form.map(f=>`<span class="${f}">${f}</span>`).join("")||"—";
+  document.getElementById("dash-manager").textContent=club.manager;
+  const md=state.fixtures[state.matchday-1]||[];
+  const next=md.find(f=>f.home===state.userClubId||f.away===state.userClubId);
+  const el=document.getElementById("next-match");
+  if(next&&!state.matchPlayedThisMD){
+    const isHome=next.home===state.userClubId; const opp=state.teams[isHome?next.away:next.home];
+    el.innerHTML=`<div style="font-size:1.05rem;font-weight:700">${isHome?"Local vs":"Visitante vs"} ${opp.name}</div><div style="color:var(--muted);margin-top:4px">Jornada ${state.matchday} · ${opp.manager} · Rating ${opp.rating}</div>`;
+  } else if(state.matchday>state.maxMatchdays) el.innerHTML=`<div style="font-weight:700">¡Temporada de liga finalizada!</div>`;
+  else el.innerHTML=`<div>Partido de liga ya jugado. Continúa a la siguiente jornada.</div>`;
+  const copaEl=document.getElementById("next-copa");
+  if(!state.copaAlive) copaEl.innerHTML=`<div style="font-weight:700;color:var(--loss)">Eliminado de la Copa del Rey</div>`;
+  else if(state.copaRound>=COPA_ROUNDS.length) copaEl.innerHTML=`<div style="font-weight:700;color:var(--win)">¡Campeón de la Copa del Rey!</div>`;
+  else if(state.copaUserMatch&&!state.copaPlayedThisRound){
+    const m=state.copaUserMatch; const isHome=m.home===state.userClubId; const opp=state.teams[isHome?m.away:m.home];
+    copaEl.innerHTML=`<div style="font-weight:700">Copa del Rey · ${COPA_ROUNDS[state.copaRound]}</div><div style="margin-top:4px">${isHome?"Local vs":"Visitante vs"} ${opp?opp.name:m.away}</div>`;
+  } else copaEl.innerHTML=`<div style="color:var(--muted)">Copa del Rey: ${COPA_ROUNDS[state.copaRound]||"Finalizada"}</div>`;
+  document.getElementById("news-feed").innerHTML=state.news.slice(0,6).map(n=>`<div class="news-item"><div class="date">${n.date}</div><div>${n.text}</div></div>`).join("")||"<div style='color:var(--muted)'>Sin noticias.</div>";
 }
 
 function sortSquadList(list){
-  const by = state.squadSortBy;
-  const dir = state.squadSortDir === "asc" ? 1 : -1;
-  return [...list].sort((a,b) => {
-    let va, vb;
+  const by=state.squadSortBy, dir=state.squadSortDir==="asc"?1:-1;
+  return [...list].sort((a,b)=>{
+    let va,vb;
     switch(by){
-      case "pos": va = POS_ORDER[a.pos]||99; vb = POS_ORDER[b.pos]||99; break;
-      case "name": return dir * a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+      case "pos": va=POS_ORDER[a.pos]||99; vb=POS_ORDER[b.pos]||99; break;
+      case "name": return dir*a.name.toLowerCase().localeCompare(b.name.toLowerCase());
       case "age": va=a.age; vb=b.age; break;
       case "ca": va=a.ca; vb=b.ca; break;
       case "pa": va=a.pa; vb=b.pa; break;
@@ -1288,45 +878,37 @@ function sortSquadList(list){
       case "value": va=a.value; vb=b.value; break;
       case "wage": va=a.wage; vb=b.wage; break;
       case "status": va=a.injured?1:0; vb=b.injured?1:0; break;
-      case "goals": va = a.goals||0; vb = b.goals||0; break;
-      case "assists": va = a.assists||0; vb = b.assists||0; break;
-      case "apps": va = a.apps||0; vb = b.apps||0; break;
-      case "rating": va = a.avgRating||0; vb = b.avgRating||0; break;
+      case "goals": va=a.goals||0; vb=b.goals||0; break;
+      case "assists": va=a.assists||0; vb=b.assists||0; break;
+      case "apps": va=a.apps||0; vb=b.apps||0; break;
+      case "rating": va=a.avgRating||0; vb=b.avgRating||0; break;
       default: va=a.ca; vb=b.ca;
     }
-    if(va < vb) return -1 * dir;
-    if(va > vb) return 1 * dir;
-    return b.ca - a.ca;
+    if(va<vb) return -1*dir; if(va>vb) return 1*dir; return b.ca-a.ca;
   });
 }
 
 function updateSortHeaders(){
-  document.querySelectorAll("#squad thead th[data-sort]").forEach(th => {
-    const key = th.dataset.sort;
-    const arrow = th.querySelector(".arrow");
-    th.classList.toggle("sorted", key === state.squadSortBy);
-    arrow.textContent = key === state.squadSortBy ? (state.squadSortDir === "asc" ? "▲" : "▼") : "";
+  document.querySelectorAll("#squad thead th[data-sort]").forEach(th=>{
+    const key=th.dataset.sort, arrow=th.querySelector(".arrow");
+    th.classList.toggle("sorted", key===state.squadSortBy);
+    arrow.textContent=key===state.squadSortBy?(state.squadSortDir==="asc"?"▲":"▼"):"";
   });
 }
 
 function renderSquad(){
-  const filter = document.getElementById("squad-filter").value;
+  const filter=document.getElementById("squad-filter").value;
   let list;
-  if(filter === "all") list = state.players;
-  else if(POS_GROUPS[filter]) list = state.players.filter(p => POS_GROUPS[filter].includes(p.pos));
-  else list = state.players.filter(p => p.pos === filter);
-
-  list = sortSquadList(list);
-  updateSortHeaders();
-
-  document.getElementById("squad-table").innerHTML = list.map(p => `
+  if(filter==="all") list=state.players;
+  else if(POS_GROUPS[filter]) list=state.players.filter(p=>POS_GROUPS[filter].includes(p.pos));
+  else list=state.players.filter(p=>p.pos===filter);
+  list=sortSquadList(list); updateSortHeaders();
+  document.getElementById("squad-table").innerHTML=list.map(p=>`
     <tr>
       <td class="pos ${p.pos}">${p.pos}</td>
       <td>
-        <div style="font-weight:600">${p.name}</div>
-        <div style="font-size:.72rem;color:var(--muted)">
-          ${p.apps||0} pj · ${p.goals||0} goles · ${p.assists||0} asis
-        </div>
+        <div class="player-name-click" onclick="openPlayerModal('${p.id}')" style="font-weight:600">${p.name}</div>
+        <div style="font-size:.72rem;color:var(--muted)">${p.apps||0} pj · ${p.goals||0} goles · ${p.assists||0} asis</div>
       </td>
       <td>${p.age}</td>
       <td class="rating">${p.ca}</td>
@@ -1336,795 +918,401 @@ function renderSquad(){
       <td>${formatMoney(p.value)}</td>
       <td>${formatMoney(p.wage)}/sem</td>
       <td>
-        ${p.injured ? '<span class="injury">Lesionado</span>' : '<span class="badge">Disponible</span>'}
-        ${p.avgRating ? `<div style="font-size:.72rem;color:var(--accent);margin-top:2px">★ ${p.avgRating.toFixed(2)}</div>` : ''}
+        ${p.injured?'<span class="injury">Lesionado</span>':'<span class="badge">Disponible</span>'}
+        ${p.avgRating?`<div style="font-size:.72rem;color:var(--accent);margin-top:2px">★ ${p.avgRating.toFixed(2)}</div>`:''}
       </td>
       <td><button class="btn danger" style="padding:4px 8px;font-size:.75rem" onclick="sellPlayer('${p.id}')">Vender</button></td>
     </tr>`).join("");
-  let currentPlayerId = null;
 }
-  
-function openPlayerModal(playerId) {
-  const p = state.players.find(pl => pl.id === playerId) || 
-            Object.values(state.teams).flatMap(t => t.players).find(pl => pl.id === playerId);
-  if (!p) return;
 
-  currentPlayerId = playerId;
+function renderPitch(){
+  const slots=FORMATIONS[state.formation]||FORMATIONS["4-2-3-1"];
+  if(state.lineup.length!==slots.length) state.lineup=Array(slots.length).fill(null);
+  document.getElementById("pitch").innerHTML=slots.map((slot,idx)=>{
+    const pid=state.lineup[idx]; const player=pid?state.players.find(p=>p.id===pid):null;
+    const selected=state.selectedSlot===idx?"selected":""; const empty=!player?"empty":"";
+    return `<div class="player-token ${selected} ${empty}" style="left:${slot.x}%;top:${slot.y}%" data-slot="${idx}" title="${player?player.name+' ('+player.pos+')':'Vacío'}">
+      <span class="num">${player?player.ca:'–'}</span><span class="name">${player?player.name.split(" ").pop():slot.pos}</span></div>`;
+  }).join("");
+  document.querySelectorAll("#pitch .player-token").forEach(tok=>{
+    tok.onclick=()=>{ const idx=+tok.dataset.slot; state.selectedSlot=state.selectedSlot===idx?null:idx; renderPitch(); renderLineupPlayers(); };
+  });
+}
 
-  // Foto
-  const img = document.getElementById("player-photo-img");
-  const placeholder = document.getElementById("player-photo-placeholder");
-  if (p.photo) {
-    img.src = p.photo;
-    img.style.display = "block";
-    placeholder.style.display = "none";
+function renderLineupPlayers(){
+  const hint=document.getElementById("lineup-hint"), listEl=document.getElementById("lineup-players");
+  if(state.selectedSlot===null){ hint.textContent="Selecciona primero una posición en el campo"; listEl.innerHTML=""; return; }
+  const slots=FORMATIONS[state.formation]||FORMATIONS["4-2-3-1"];
+  const preferredPos=slots[state.selectedSlot]?.pos||"MC";
+  hint.innerHTML=`Elige jugador para la posición <strong>${preferredPos}</strong>`;
+  const inXi=new Set(state.lineup.filter(Boolean));
+  const available=state.players.filter(p=>!p.injured).sort((a,b)=>{
+    const aExact=a.pos===preferredPos?0:1, bExact=b.pos===preferredPos?0:1;
+    if(aExact!==bExact) return aExact-bExact;
+    const group=Object.entries(POS_GROUPS).find(([k,v])=>v.includes(preferredPos));
+    if(group){ const aG=group[1].includes(a.pos)?0:1, bG=group[1].includes(b.pos)?0:1; if(aG!==bG) return aG-bG; }
+    return b.ca-a.ca;
+  });
+  listEl.innerHTML=available.map(p=>{
+    const already=inXi.has(p.id)?"in-xi":"";
+    return `<div class="lineup-player ${already}" data-id="${p.id}"><span class="ppos pos ${p.pos}">${p.pos}</span><span style="flex:1">${p.name}</span><span class="rating">${p.ca}</span><span style="color:var(--muted);font-size:.75rem">${p.condition}%</span></div>`;
+  }).join("")||"<div style='color:var(--muted)'>No hay jugadores disponibles</div>";
+  listEl.querySelectorAll(".lineup-player:not(.in-xi)").forEach(el=>{
+    el.onclick=()=>{ const pid=el.dataset.id; const prevIdx=state.lineup.indexOf(pid); if(prevIdx!==-1) state.lineup[prevIdx]=null; state.lineup[state.selectedSlot]=pid; state.selectedSlot=null; renderPitch(); renderLineupPlayers(); saveGame(); };
+  });
+}
+
+function renderStandings(){
+  const sorted=Object.values(state.teams).filter(t=>!t.id.startsWith("mod")).sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf);
+  document.getElementById("standings-body").innerHTML=sorted.map((t,i)=>`
+    <tr class="${t.id===state.userClubId?'you':''}"><td>${i+1}</td><td>${t.name}${t.id===state.userClubId?' ★':''}</td>
+    <td style="font-size:.8rem;color:var(--muted)">${t.manager}</td><td>${t.played}</td><td>${t.won}</td><td>${t.drawn}</td><td>${t.lost}</td>
+    <td>${t.gf}</td><td>${t.ga}</td><td>${t.gf-t.ga>0?'+':''}${t.gf-t.ga}</td><td><strong>${t.pts}</strong></td>
+    <td class="form">${t.form.map(f=>`<span class="${f}">${f}</span>`).join("")}</td></tr>`).join("");
+}
+
+function renderCopa(){
+  let html=`<div class="copa-round"><h3>${COPA_ROUNDS[state.copaRound]||"Finalizada"}</h3>`;
+  if(!state.copaBracket.length) html+=`<div style="color:var(--muted)">Copa finalizada.</div>`;
+  else state.copaBracket.forEach(m=>{
+    const hName=state.teams[m.home]?.name||m.home, aName=state.teams[m.away]?.name||m.away;
+    const isYou=m.home===state.userClubId||m.away===state.userClubId;
+    const score=m.played?`${m.hg} - ${m.ag}`:"vs";
+    html+=`<div class="copa-match ${isYou?'you':''}"><span>${hName}</span><strong>${score}</strong><span>${aName}</span></div>`;
+  });
+  html+=`</div>`;
+  if(state.copaAlive&&state.copaUserMatch&&!state.copaPlayedThisRound) html+=`<button class="btn" id="btn-sim-copa" style="margin-top:12px">Jugar partido de Copa</button>`;
+  else if(state.copaAlive&&state.copaPlayedThisRound) html+=`<p style="color:var(--muted);margin-top:10px">Partido de esta ronda jugado. Avanza jornada para la siguiente eliminatoria.</p>`;
+  document.getElementById("copa-content").innerHTML=html;
+  const btn=document.getElementById("btn-sim-copa"); if(btn) btn.onclick=playCopaMatch;
+}
+
+function renderTransfers(){
+  document.getElementById("transfer-budget").textContent=formatMoney(state.budget*1000);
+  document.getElementById("transfer-table").innerHTML=state.transferList.map(p=>`
+    <tr><td class="pos ${p.pos}">${p.pos}</td><td>${p.name}</td><td>${p.age}</td><td class="rating">${p.ca}</td>
+    <td>${p.club}</td><td>${formatMoney(p.value)}</td><td>${formatMoney(p.wage)}/sem</td>
+    <td><button class="btn" style="padding:5px 10px;font-size:.8rem" onclick="buyPlayer('${p.id}')">Fichar</button></td></tr>`).join("");
+  renderClubSelectForTransfers();
+}
+
+function renderClubSelectForTransfers(){
+  const select=document.getElementById("target-club-select"); if(!select) return;
+  select.innerHTML=CLUBS.filter(c=>c.id!==state.userClubId).map(c=>`<option value="${c.id}">${c.name}</option>`).join("");
+  select.onchange=()=>renderTargetSquad(select.value);
+  if(select.value) renderTargetSquad(select.value);
+}
+
+function renderTargetSquad(clubId){
+  const team=state.teams[clubId]; if(!team) return;
+  document.getElementById("target-club-info").innerHTML=`<strong>${team.name}</strong> · Entrenador: ${team.manager} · Rating: ${team.rating}`;
+  const players=[...team.players].sort((a,b)=>b.ca-a.ca);
+  document.getElementById("target-squad-table").innerHTML=players.map(p=>`
+    <tr><td class="pos ${p.pos}">${p.pos}</td><td class="player-name-click" onclick="openPlayerModal('${p.id}')">${p.name}</td>
+    <td>${p.age}</td><td class="rating">${p.ca}</td><td class="stat">${p.pa}</td>
+    <td>${formatMoney(p.value)}</td><td>${formatMoney(p.wage)}/sem</td>
+    <td><button class="btn" style="padding:5px 10px;font-size:.8rem" onclick="makeOffer('${clubId}','${p.id}')">Ofertar</button></td></tr>`).join("");
+}
+
+function makeOffer(fromClubId, playerId){
+  const team=state.teams[fromClubId]; if(!team) return;
+  const player=team.players.find(p=>p.id===playerId); if(!player) return;
+  const suggested=Math.round(player.value*1.15);
+  const input=prompt(`¿Cuánto ofreces por ${player.name}?\n\nValor de mercado: ${formatMoney(player.value)}\nOferta recomendada: ${formatMoney(suggested)}\nPresupuesto disponible: ${formatMoney(state.budget*1000)}`, suggested);
+  if(input===null) return;
+  const offer=parseInt(input); if(isNaN(offer)||offer<=0){alert("Cantidad no válida.");return;}
+  if(offer>state.budget*1000){alert("No tienes suficiente presupuesto.");return;}
+  const ratio=offer/player.value;
+  let acceptChance=0;
+  if(ratio>=1.4) acceptChance=0.92; else if(ratio>=1.2) acceptChance=0.75; else if(ratio>=1.05) acceptChance=0.55;
+  else if(ratio>=0.95) acceptChance=0.30; else if(ratio>=0.80) acceptChance=0.12; else acceptChance=0.03;
+  if(["rm","bar","atm"].includes(fromClubId)) acceptChance*=0.70;
+  if(player.ca>=160) acceptChance*=0.85; if(player.ca>=170) acceptChance*=0.75;
+  if(Math.random()<acceptChance){
+    state.budget-=offer/1000;
+    team.players=team.players.filter(p=>p.id!==playerId);
+    const newPlayer={...player}; state.players.push(newPlayer); state.teams[state.userClubId].players=state.players;
+    addNews(`¡Fichaje! ${player.name} llega procedente del ${team.name} por ${formatMoney(offer)}`);
+    addInbox("Secretaría Técnica","Fichaje cerrado",`${player.name} ha firmado. Coste: ${formatMoney(offer)}.`);
+    alert(`¡El ${team.name} ha aceptado tu oferta de ${formatMoney(offer)} por ${player.name}!`);
+    renderTargetSquad(fromClubId); updateAll(); saveGame();
   } else {
-    img.style.display = "none";
-    placeholder.style.display = "flex";
+    let msg=ratio<0.9?"Oferta demasiado baja.":ratio<1.1?"El club considera la oferta insuficiente.":"El jugador no quiere marcharse / el club no vende.";
+    alert(`Oferta rechazada.\n\n${msg}`); addNews(`Oferta rechazada: ${team.name} no vende a ${player.name}`);
   }
+}
 
-  document.getElementById("pm-name").textContent = p.name;
-  document.getElementById("pm-pos-age").textContent = `${p.pos} · ${p.age} años`;
-  document.getElementById("pm-ca").textContent = p.ca;
-  document.getElementById("pm-pa").textContent = p.pa;
-  document.getElementById("pm-cond").textContent = p.condition + "%";
-  document.getElementById("pm-morale").textContent = p.morale + "%";
-  document.getElementById("pm-form").textContent = p.form + "/10";
-  document.getElementById("pm-value").textContent = formatMoney(p.value);
-  document.getElementById("pm-wage").textContent = formatMoney(p.wage) + "/sem";
-  document.getElementById("pm-contract").textContent = p.contractEnd || "2028";
-
-  // Estadísticas
-  document.getElementById("pm-stats").innerHTML = `
+function openPlayerModal(playerId){
+  let p=state.players.find(pl=>pl.id===playerId);
+  if(!p) for(const t of Object.values(state.teams)){ p=t.players.find(pl=>pl.id===playerId); if(p) break; }
+  if(!p) return;
+  currentPlayerId=playerId;
+  const img=document.getElementById("player-photo-img"), placeholder=document.getElementById("player-photo-placeholder");
+  if(p.photo){ img.src=p.photo; img.style.display="block"; placeholder.style.display="none"; }
+  else { img.style.display="none"; placeholder.style.display="flex"; }
+  document.getElementById("pm-name").textContent=p.name;
+  document.getElementById("pm-pos-age").textContent=`${p.pos} · ${p.age} años`;
+  document.getElementById("pm-ca").textContent=p.ca;
+  document.getElementById("pm-pa").textContent=p.pa;
+  document.getElementById("pm-cond").textContent=p.condition+"%";
+  document.getElementById("pm-morale").textContent=p.morale+"%";
+  document.getElementById("pm-form").textContent=p.form+"/10";
+  document.getElementById("pm-value").textContent=formatMoney(p.value);
+  document.getElementById("pm-wage").textContent=formatMoney(p.wage)+"/sem";
+  document.getElementById("pm-contract").textContent=p.contractEnd||"2028";
+  document.getElementById("pm-stats").innerHTML=`
     <div class="stat-chip">Partidos <strong>${p.apps||0}</strong></div>
     <div class="stat-chip">Goles <strong>${p.goals||0}</strong></div>
     <div class="stat-chip">Asistencias <strong>${p.assists||0}</strong></div>
     <div class="stat-chip">Amarillas <strong>${p.yellows||0}</strong></div>
     <div class="stat-chip">Rojas <strong>${p.reds||0}</strong></div>
     <div class="stat-chip">MVP <strong>${p.motm||0}</strong></div>
-    <div class="stat-chip">Media <strong>${p.avgRating ? p.avgRating.toFixed(2) : "—"}</strong></div>
-  `;
-
-  // Historial
-  const hist = p.history && p.history.length 
-    ? p.history.map(h => `• ${h}`).join("<br>") 
-    : "Sin historial registrado todavía.";
-  document.getElementById("pm-history").innerHTML = hist;
-
+    <div class="stat-chip">Media <strong>${p.avgRating?p.avgRating.toFixed(2):"—"}</strong></div>`;
+  const hist=p.history&&p.history.length?p.history.map(h=>`• ${h}`).join("<br>"):"Sin historial registrado todavía.";
+  document.getElementById("pm-history").innerHTML=hist;
   document.getElementById("player-modal").classList.add("visible");
 }
 
-function closePlayerModal() {
-  document.getElementById("player-modal").classList.remove("visible");
-  currentPlayerId = null;
-}
+function closePlayerModal(){ document.getElementById("player-modal").classList.remove("visible"); currentPlayerId=null; }
 
-function setPlayerPhoto(dataUrl) {
-  if (!currentPlayerId) return;
-  // Buscar en la plantilla del usuario o en cualquier equipo
-  let p = state.players.find(pl => pl.id === currentPlayerId);
-  if (!p) {
-    for (const t of Object.values(state.teams)) {
-      p = t.players.find(pl => pl.id === currentPlayerId);
-      if (p) break;
-    }
-  }
-  if (!p) return;
-  p.photo = dataUrl;
-  saveGame();
-  openPlayerModal(currentPlayerId); // refrescar
-}
-}
-
-function renderPitch(){
-  const slots = FORMATIONS[state.formation] || FORMATIONS["4-2-3-1"];
-  if(state.lineup.length !== slots.length){
-    state.lineup = Array(slots.length).fill(null);
-  }
-
-  document.getElementById("pitch").innerHTML = slots.map((slot, idx) => {
-    const pid = state.lineup[idx];
-    const player = pid ? state.players.find(p => p.id === pid) : null;
-    const selected = state.selectedSlot === idx ? "selected" : "";
-    const empty = !player ? "empty" : "";
-    return `<div class="player-token ${selected} ${empty}" style="left:${slot.x}%;top:${slot.y}%" data-slot="${idx}" title="${player ? player.name + ' ('+player.pos+')' : 'Vacío - clic para elegir'}">
-      <span class="num">${player ? player.ca : '–'}</span>
-      <span class="name">${player ? player.name.split(" ").pop() : slot.pos}</span>
-    </div>`;
-  }).join("");
-
-  document.querySelectorAll("#pitch .player-token").forEach(tok => {
-    tok.onclick = () => {
-      const idx = +tok.dataset.slot;
-      state.selectedSlot = state.selectedSlot === idx ? null : idx;
-      renderPitch();
-      renderLineupPlayers();
-    };
-  });
-}
-
-function renderLineupPlayers(){
-  const hint = document.getElementById("lineup-hint");
-  const listEl = document.getElementById("lineup-players");
-  if(state.selectedSlot === null){
-    hint.textContent = "Selecciona primero una posición en el campo";
-    listEl.innerHTML = "";
-    return;
-  }
-  const slots = FORMATIONS[state.formation] || FORMATIONS["4-2-3-1"];
-  const preferredPos = slots[state.selectedSlot]?.pos || "MC";
-  hint.innerHTML = `Elige jugador para la posición <strong>${preferredPos}</strong>`;
-
-  const inXi = new Set(state.lineup.filter(Boolean));
-  const available = state.players
-    .filter(p => !p.injured)
-    .sort((a,b) => {
-      // Prioridad: posición exacta > mismo grupo > resto
-      const aExact = a.pos === preferredPos ? 0 : 1;
-      const bExact = b.pos === preferredPos ? 0 : 1;
-      if(aExact !== bExact) return aExact - bExact;
-
-      const group = Object.entries(POS_GROUPS).find(([k,v]) => v.includes(preferredPos));
-      if(group){
-        const aGroup = group[1].includes(a.pos) ? 0 : 1;
-        const bGroup = group[1].includes(b.pos) ? 0 : 1;
-        if(aGroup !== bGroup) return aGroup - bGroup;
-      }
-      return b.ca - a.ca;
-    });
-
-  listEl.innerHTML = available.map(p => {
-    const already = inXi.has(p.id) ? "in-xi" : "";
-    return `<div class="lineup-player ${already}" data-id="${p.id}">
-      <span class="ppos pos ${p.pos}">${p.pos}</span>
-      <span style="flex:1">${p.name}</span>
-      <span class="rating">${p.ca}</span>
-      <span style="color:var(--muted);font-size:.75rem">${p.condition}%</span>
-    </div>`;
-  }).join("") || "<div style='color:var(--muted)'>No hay jugadores disponibles</div>";
-
-  listEl.querySelectorAll(".lineup-player:not(.in-xi)").forEach(el => {
-    el.onclick = () => {
-      const pid = el.dataset.id;
-      const prevIdx = state.lineup.indexOf(pid);
-      if(prevIdx !== -1) state.lineup[prevIdx] = null;
-      state.lineup[state.selectedSlot] = pid;
-      state.selectedSlot = null;
-      renderPitch();
-      renderLineupPlayers();
-      saveGame();
-    };
-  });
-}
-
-function renderStandings(){
-  const sorted = Object.values(state.teams).filter(t => !t.id.startsWith("mod"))
-    .sort((a,b) => b.pts - a.pts || (b.gf-b.ga) - (a.gf-a.ga) || b.gf - a.gf);
-  document.getElementById("standings-body").innerHTML = sorted.map((t,i) => `
-    <tr class="${t.id === state.userClubId ? 'you' : ''}">
-      <td>${i+1}</td>
-      <td>${t.name}${t.id === state.userClubId ? ' ★' : ''}</td>
-      <td style="font-size:.8rem;color:var(--muted)">${t.manager}</td>
-      <td>${t.played}</td><td>${t.won}</td><td>${t.drawn}</td><td>${t.lost}</td>
-      <td>${t.gf}</td><td>${t.ga}</td>
-      <td>${t.gf - t.ga > 0 ? '+' : ''}${t.gf - t.ga}</td>
-      <td><strong>${t.pts}</strong></td>
-      <td class="form">${t.form.map(f => `<span class="${f}">${f}</span>`).join("")}</td>
-    </tr>`).join("");
-}
-
-function renderCopa(){
-  let html = `<div class="copa-round"><h3>${COPA_ROUNDS[state.copaRound] || "Finalizada"}</h3>`;
-  if(state.copaBracket.length === 0){
-    html += `<div style="color:var(--muted)">Copa finalizada.</div>`;
-  } else {
-    state.copaBracket.forEach(m => {
-      const hName = state.teams[m.home] ? state.teams[m.home].name : m.home;
-      const aName = state.teams[m.away] ? state.teams[m.away].name : m.away;
-      const isYou = m.home === state.userClubId || m.away === state.userClubId;
-      const score = m.played ? `${m.hg} - ${m.ag}` : "vs";
-      html += `<div class="copa-match ${isYou ? 'you' : ''}"><span>${hName}</span><strong>${score}</strong><span>${aName}</span></div>`;
-    });
-  }
-  html += `</div>`;
-  if(state.copaAlive && state.copaUserMatch && !state.copaPlayedThisRound){
-    html += `<button class="btn" id="btn-sim-copa" style="margin-top:12px">Jugar partido de Copa</button>`;
-  } else if(state.copaAlive && state.copaPlayedThisRound){
-    html += `<p style="color:var(--muted);margin-top:10px">Partido de esta ronda jugado. Avanza jornada para la siguiente eliminatoria.</p>`;
-  }
-  document.getElementById("copa-content").innerHTML = html;
-  const btn = document.getElementById("btn-sim-copa");
-  if(btn) btn.onclick = playCopaMatch;
-}
-
-function renderTransfers(){
-  document.getElementById("transfer-budget").textContent = formatMoney(state.budget * 1000);
-  
-  // Mercado libre
-  document.getElementById("transfer-table").innerHTML = state.transferList.map(p => `
-    <tr>
-      <td class="pos ${p.pos}">${p.pos}</td>
-      <td>${p.name}</td>
-      <td>${p.age}</td>
-      <td class="rating">${p.ca}</td>
-      <td>${p.club}</td>
-      <td>${formatMoney(p.value)}</td>
-      <td>${formatMoney(p.wage)}/sem</td>
-      <td><button class="btn" style="padding:5px 10px;font-size:.8rem" onclick="buyPlayer('${p.id}')">Fichar</button></td>
-    </tr>`).join("");
-
-  // Rellenar selector de clubes
-  renderClubSelectForTransfers();
-}
-
-function renderClubSelectForTransfers(){
-  const select = document.getElementById("target-club-select");
-  if(!select) return;
-  select.innerHTML = CLUBS
-    .filter(c => c.id !== state.userClubId)
-    .map(c => `<option value="${c.id}">${c.name}</option>`)
-    .join("");
-  
-  select.onchange = () => renderTargetSquad(select.value);
-  // Cargar el primero por defecto
-  if(select.value) renderTargetSquad(select.value);
-}
-
-function renderTargetSquad(clubId){
-  const team = state.teams[clubId];
-  if(!team) return;
-
-  document.getElementById("target-club-info").innerHTML = 
-    `<strong>${team.name}</strong> · Entrenador: ${team.manager} · Rating: ${team.rating}`;
-
-  const players = [...team.players].sort((a,b) => b.ca - a.ca);
-
-  document.getElementById("target-squad-table").innerHTML = players.map(p => `
-    <tr>
-      <td class="pos ${p.pos}">${p.pos}</td>
-      <td>${p.name}</td>
-      <td>${p.age}</td>
-      <td class="rating">${p.ca}</td>
-      <td class="stat">${p.pa}</td>
-      <td>${formatMoney(p.value)}</td>
-      <td>${formatMoney(p.wage)}/sem</td>
-      <td>
-        <button class="btn" style="padding:5px 10px;font-size:.8rem" 
-          onclick="makeOffer('${clubId}','${p.id}')">
-          Ofertar
-        </button>
-      </td>
-    </tr>
-  `).join("");
-}
-
-function makeOffer(fromClubId, playerId){
-  const team = state.teams[fromClubId];
-  if(!team) return;
-  const player = team.players.find(p => p.id === playerId);
-  if(!player) return;
-
-  // Oferta mínima sugerida
-  const minOffer = Math.round(player.value * 0.85);
-  const suggested = Math.round(player.value * 1.15);
-
-  const input = prompt(
-    `¿Cuánto ofreces por ${player.name}?\n\n` +
-    `Valor de mercado: ${formatMoney(player.value)}\n` +
-    `Oferta recomendada: ${formatMoney(suggested)}\n` +
-    `Presupuesto disponible: ${formatMoney(state.budget * 1000)}`,
-    suggested
-  );
-
-  if(input === null) return; // canceló
-  const offer = parseInt(input);
-  if(isNaN(offer) || offer <= 0){
-    alert("Cantidad no válida.");
-    return;
-  }
-
-  if(offer > state.budget * 1000){
-    alert("No tienes suficiente presupuesto.");
-    return;
-  }
-
-  // Lógica de aceptación
-  const ratio = offer / player.value;
-  let acceptChance = 0;
-
-  if(ratio >= 1.4) acceptChance = 0.92;
-  else if(ratio >= 1.2) acceptChance = 0.75;
-  else if(ratio >= 1.05) acceptChance = 0.55;
-  else if(ratio >= 0.95) acceptChance = 0.30;
-  else if(ratio >= 0.80) acceptChance = 0.12;
-  else acceptChance = 0.03;
-
-  // Equipos grandes son más duros
-  const bigClubs = ["rm","bar","atm"];
-  if(bigClubs.includes(fromClubId)) acceptChance *= 0.70;
-
-  // Jugadores muy buenos (CA alto) también más difíciles
-  if(player.ca >= 160) acceptChance *= 0.85;
-  if(player.ca >= 170) acceptChance *= 0.75;
-
-  const accepted = Math.random() < acceptChance;
-
-  if(accepted){
-    // Fichaje aceptado
-    state.budget -= offer / 1000;
-    
-    // Quitar del equipo rival
-    team.players = team.players.filter(p => p.id !== playerId);
-    
-    // Añadir a tu equipo
-    const newPlayer = {...player};
-    state.players.push(newPlayer);
-    state.teams[state.userClubId].players = state.players;
-
-    addNews(`¡Fichaje! ${player.name} llega procedente del ${team.name} por ${formatMoney(offer)}`);
-    addInbox("Secretaría Técnica", "Fichaje cerrado", 
-      `${player.name} ha firmado por el club. Coste: ${formatMoney(offer)}.`);
-    
-    alert(`¡El ${team.name} ha aceptado tu oferta de ${formatMoney(offer)} por ${player.name}!`);
-    
-    renderTargetSquad(fromClubId);
-    updateAll();
-    saveGame();
-  } else {
-    // Rechazado
-    let msg = "";
-    if(ratio < 0.9) msg = "Oferta demasiado baja. Ni se la han planteado.";
-    else if(ratio < 1.1) msg = "El club considera que la oferta es insuficiente.";
-    else msg = "El jugador no quiere marcharse / el club no vende a ese precio.";
-    
-    alert(`Oferta rechazada.\n\n${msg}`);
-    addNews(`Oferta rechazada: ${team.name} no vende a ${player.name}`);
-  }
+function setPlayerPhoto(dataUrl){
+  if(!currentPlayerId) return;
+  let p=state.players.find(pl=>pl.id===currentPlayerId);
+  if(!p) for(const t of Object.values(state.teams)){ p=t.players.find(pl=>pl.id===currentPlayerId); if(p) break; }
+  if(!p) return;
+  p.photo=dataUrl; saveGame(); openPlayerModal(currentPlayerId);
 }
 
 function renderInbox(){
-  document.getElementById("inbox-list").innerHTML = state.inbox.map(m => `
-    <div class="news-item">
-      <div class="date">${m.date} · ${m.from}</div>
-      <div style="font-weight:600;margin:4px 0">${m.subject}</div>
-      <div style="color:var(--muted)">${m.body}</div>
-    </div>`).join("") || "<div style='color:var(--muted)'>Bandeja vacía.</div>";
+  document.getElementById("inbox-list").innerHTML=state.inbox.map(m=>`
+    <div class="news-item"><div class="date">${m.date} · ${m.from}</div>
+    <div style="font-weight:600;margin:4px 0">${m.subject}</div><div style="color:var(--muted)">${m.body}</div></div>`).join("")||"<div style='color:var(--muted)'>Bandeja vacía.</div>";
 }
 
-function addNews(t){ state.news.unshift({date:`J${state.matchday}`, text:t}); state.news = state.news.slice(0,30); }
-function addInbox(f,s,b){ state.inbox.unshift({date:`Jornada ${state.matchday}`, from:f, subject:s, body:b}); }
+function addNews(t){ state.news.unshift({date:`J${state.matchday}`,text:t}); state.news=state.news.slice(0,30); }
+function addInbox(f,s,b){ state.inbox.unshift({date:`Jornada ${state.matchday}`,from:f,subject:s,body:b}); }
 
 function playUserMatch(){
   if(state.matchPlayedThisMD) return;
-  const validXI = state.lineup.filter(id => id && state.players.find(p => p.id === id && !p.injured)).length;
-  if(validXI < 8){
-    if(!confirm("La alineación tiene menos de 8 jugadores disponibles. ¿Usar Auto XI y continuar?")) return;
-    autoSelectLineup();
-  }
-  const md = state.fixtures[state.matchday-1];
-  if(!md) return;
-  const fixture = md.find(f => f.home === state.userClubId || f.away === state.userClubId);
-  if(!fixture) return;
-
-  md.forEach(f => {
-    if(f.home === state.userClubId || f.away === state.userClubId) return;
-    const r = simulateMatch(f.home, f.away);
-    applyResult(f.home, f.away, r.homeGoals, r.awayGoals);
-  });
-
-  const result = simulateMatch(fixture.home, fixture.away);
-  applyResult(fixture.home, fixture.away, result.homeGoals, result.awayGoals);
-  state.matchPlayedThisMD = true;
-
-  document.getElementById("match-home").textContent = state.teams[fixture.home].name;
-  document.getElementById("match-away").textContent = state.teams[fixture.away].name;
-  document.getElementById("match-score").textContent = `${result.homeGoals} - ${result.awayGoals}`;
-  document.getElementById("match-status").textContent = "Partido finalizado";
-  document.getElementById("match-events").innerHTML = result.events.map(e => 
-    `<div class="event ${e.type}"><span class="min">${e.min}'</span><span>${e.text}</span></div>`
-  ).join("") || "<div style='color:var(--muted)'>Sin eventos destacados.</div>";
-  document.getElementById("btn-sim-match").style.display = "none";
-  document.getElementById("btn-next-matchday").style.display = "inline-block";
-
-  const uh = fixture.home === state.userClubId;
-  const ug = uh ? result.homeGoals : result.awayGoals;
-  const og = uh ? result.awayGoals : result.homeGoals;
-  const on = state.teams[uh ? fixture.away : fixture.home].name;
-  if(ug > og) addNews(`¡Victoria! ${state.teams[state.userClubId].name} ${ug}-${og} ${on}`);
-  else if(ug < og) addNews(`Derrota ${ug}-${og} ante ${on}`);
+  const validXI=state.lineup.filter(id=>id&&state.players.find(p=>p.id===id&&!p.injured)).length;
+  if(validXI<8){ if(!confirm("La alineación tiene menos de 8 jugadores disponibles. ¿Usar Auto XI y continuar?")) return; autoSelectLineup(); }
+  const md=state.fixtures[state.matchday-1]; if(!md) return;
+  const fixture=md.find(f=>f.home===state.userClubId||f.away===state.userClubId); if(!fixture) return;
+  md.forEach(f=>{ if(f.home===state.userClubId||f.away===state.userClubId) return; const r=simulateMatch(f.home,f.away); applyResult(f.home,f.away,r.homeGoals,r.awayGoals); });
+  const result=simulateMatch(fixture.home,fixture.away); applyResult(fixture.home,fixture.away,result.homeGoals,result.awayGoals);
+  state.matchPlayedThisMD=true;
+  document.getElementById("match-home").textContent=state.teams[fixture.home].name;
+  document.getElementById("match-away").textContent=state.teams[fixture.away].name;
+  document.getElementById("match-score").textContent=`${result.homeGoals} - ${result.awayGoals}`;
+  document.getElementById("match-status").textContent="Partido finalizado";
+  document.getElementById("match-events").innerHTML=result.events.map(e=>`<div class="event ${e.type}"><span class="min">${e.min}'</span><span>${e.text}</span></div>`).join("")||"<div style='color:var(--muted)'>Sin eventos destacados.</div>";
+  document.getElementById("btn-sim-match").style.display="none";
+  document.getElementById("btn-next-matchday").style.display="inline-block";
+  const uh=fixture.home===state.userClubId, ug=uh?result.homeGoals:result.awayGoals, og=uh?result.awayGoals:result.homeGoals, on=state.teams[uh?fixture.away:fixture.home].name;
+  if(ug>og) addNews(`¡Victoria! ${state.teams[state.userClubId].name} ${ug}-${og} ${on}`);
+  else if(ug<og) addNews(`Derrota ${ug}-${og} ante ${on}`);
   else addNews(`Empate ${ug}-${og} contra ${on}`);
-  if(Math.random() < 0.4) addInbox("Director Deportivo","Análisis post-partido","Buen esfuerzo. Mejorar la transición defensiva.");
-  showScreen("match");
-  updateHeader();
-  saveGame();
+  if(Math.random()<0.4) addInbox("Director Deportivo","Análisis post-partido","Buen esfuerzo. Mejorar la transición defensiva.");
+  showScreen("match"); updateHeader(); saveGame();
 }
 
 function playCopaMatch(){
-  if(!state.copaUserMatch || state.copaPlayedThisRound || !state.copaAlive) return;
-  const validXI = state.lineup.filter(id => id && state.players.find(p => p.id === id && !p.injured)).length;
-  if(validXI < 8){
-    if(!confirm("La alineación tiene menos de 8 jugadores disponibles. ¿Usar Auto XI y continuar?")) return;
-    autoSelectLineup();
-  }
-  const m = state.copaUserMatch;
-  const result = simulateMatch(m.home, m.away);
-  m.hg = result.homeGoals;
-  m.ag = result.awayGoals;
-  m.played = true;
-  state.copaPlayedThisRound = true;
-
-  let winner;
-  if(result.homeGoals > result.awayGoals) winner = m.home;
-  else if(result.awayGoals > result.homeGoals) winner = m.away;
-  else winner = Math.random() < 0.5 ? m.home : m.away;
-
-  const isUserWin = winner === state.userClubId;
-  if(!isUserWin){
-    state.copaAlive = false;
-    addNews(`Eliminado de la Copa del Rey en ${COPA_ROUNDS[state.copaRound]}`);
-  } else {
-    addNews(`¡Clasificado en Copa del Rey! (${COPA_ROUNDS[state.copaRound]})`);
-  }
-
-  state.copaBracket.forEach(match => {
-    if(match.played) return;
-    const r = simulateMatch(match.home, match.away);
-    match.hg = r.homeGoals;
-    match.ag = r.awayGoals;
-    match.played = true;
-  });
-
-  showScreen("copa");
-  renderCopa();
-  updateHeader();
-  saveGame();
+  if(!state.copaUserMatch||state.copaPlayedThisRound||!state.copaAlive) return;
+  const validXI=state.lineup.filter(id=>id&&state.players.find(p=>p.id===id&&!p.injured)).length;
+  if(validXI<8){ if(!confirm("La alineación tiene menos de 8 jugadores disponibles. ¿Usar Auto XI y continuar?")) return; autoSelectLineup(); }
+  const m=state.copaUserMatch; const result=simulateMatch(m.home,m.away);
+  m.hg=result.homeGoals; m.ag=result.awayGoals; m.played=true; state.copaPlayedThisRound=true;
+  let winner; if(result.homeGoals>result.awayGoals) winner=m.home; else if(result.awayGoals>result.homeGoals) winner=m.away; else winner=Math.random()<0.5?m.home:m.away;
+  if(winner!==state.userClubId){ state.copaAlive=false; addNews(`Eliminado de la Copa del Rey en ${COPA_ROUNDS[state.copaRound]}`); }
+  else addNews(`¡Clasificado en Copa del Rey! (${COPA_ROUNDS[state.copaRound]})`);
+  state.copaBracket.forEach(match=>{ if(match.played) return; const r=simulateMatch(match.home,match.away); match.hg=r.homeGoals; match.ag=r.awayGoals; match.played=true; });
+  showScreen("copa"); renderCopa(); updateHeader(); saveGame();
 }
 
 function advanceCopaRound(){
-  if(!state.copaAlive || state.copaRound >= COPA_ROUNDS.length-1) return;
-  const winners = [];
-  state.copaBracket.forEach(m => {
-    if(m.hg > m.ag) winners.push(m.home);
-    else if(m.ag > m.hg) winners.push(m.away);
-    else winners.push(Math.random() < 0.5 ? m.home : m.away);
-  });
-  if(winners.length < 2){ state.copaRound = COPA_ROUNDS.length; return; }
-
-  const newBracket = [];
-  const shuffled = winners.sort(() => Math.random()-0.5);
-  for(let i=0; i<shuffled.length; i+=2){
-    if(shuffled[i+1]) newBracket.push({home: shuffled[i], away: shuffled[i+1], played: false, hg: null, ag: null});
-  }
-  state.copaBracket = newBracket;
-  state.copaRound++;
-  state.copaUserMatch = newBracket.find(m => m.home === state.userClubId || m.away === state.userClubId) || null;
-  state.copaPlayedThisRound = false;
-  if(!state.copaUserMatch) state.copaAlive = false;
+  if(!state.copaAlive||state.copaRound>=COPA_ROUNDS.length-1) return;
+  const winners=[]; state.copaBracket.forEach(m=>{ if(m.hg>m.ag) winners.push(m.home); else if(m.ag>m.hg) winners.push(m.away); else winners.push(Math.random()<0.5?m.home:m.away); });
+  if(winners.length<2){ state.copaRound=COPA_ROUNDS.length; return; }
+  const newBracket=[], shuffled=winners.sort(()=>Math.random()-0.5);
+  for(let i=0;i<shuffled.length;i+=2) if(shuffled[i+1]) newBracket.push({home:shuffled[i],away:shuffled[i+1],played:false,hg:null,ag:null});
+  state.copaBracket=newBracket; state.copaRound++;
+  state.copaUserMatch=newBracket.find(m=>m.home===state.userClubId||m.away===state.userClubId)||null;
+  state.copaPlayedThisRound=false; if(!state.copaUserMatch) state.copaAlive=false;
 }
 
 function nextMatchday(){
-  if(state.matchday >= state.maxMatchdays){
-    addNews("¡Fin de la temporada de liga!");
-    updateAll();
-    return;
-  }
-  if(state.copaPlayedThisRound && state.copaAlive) advanceCopaRound();
-
-  state.matchday++;
-  state.matchPlayedThisMD = false;
-  state.trainingApplied = false;
-  state.players.forEach(p => {
-    if(!p.injured) p.condition = clamp(p.condition + rand(5,15), 50, 100);
-    if(p.injured && Math.random() < 0.35) p.injured = false;
-    p.morale = clamp(p.morale + rand(-3,5), 30, 100);
-  });
-
-  document.getElementById("btn-sim-match").style.display = "inline-block";
-  document.getElementById("btn-next-matchday").style.display = "none";
-  document.getElementById("match-score").textContent = "0 - 0";
-  document.getElementById("match-events").innerHTML = "";
-  document.getElementById("match-status").textContent = "Listo para comenzar";
-  addNews(`Comienza la jornada ${state.matchday}`);
-  updateAll();
-  showScreen("dashboard");
-  saveGame();
+  if(state.matchday>=state.maxMatchdays){ addNews("¡Fin de la temporada de liga!"); updateAll(); return; }
+  if(state.copaPlayedThisRound&&state.copaAlive) advanceCopaRound();
+  state.matchday++; state.matchPlayedThisMD=false; state.trainingApplied=false;
+  state.players.forEach(p=>{ if(!p.injured) p.condition=clamp(p.condition+rand(5,15),50,100); if(p.injured&&Math.random()<0.35) p.injured=false; p.morale=clamp(p.morale+rand(-3,5),30,100); });
+  document.getElementById("btn-sim-match").style.display="inline-block";
+  document.getElementById("btn-next-matchday").style.display="none";
+  document.getElementById("match-score").textContent="0 - 0";
+  document.getElementById("match-events").innerHTML="";
+  document.getElementById("match-status").textContent="Listo para comenzar";
+  addNews(`Comienza la jornada ${state.matchday}`); updateAll(); showScreen("dashboard"); saveGame();
 }
 
 function buyPlayer(id){
-  const idx = state.transferList.findIndex(p => p.id === id);
-  if(idx === -1) return;
-  const p = state.transferList[idx];
-  if(state.budget * 1000 < p.value){ alert("Presupuesto insuficiente."); return; }
+  const idx=state.transferList.findIndex(p=>p.id===id); if(idx===-1) return;
+  const p=state.transferList[idx];
+  if(state.budget*1000<p.value){alert("Presupuesto insuficiente.");return;}
   if(!confirm(`¿Fichar a ${p.name} por ${formatMoney(p.value)}?`)) return;
-  state.budget -= p.value / 1000;
-  state.players.push({...p, club: undefined});
-  state.teams[state.userClubId].players = state.players;
-  state.transferList.splice(idx, 1);
-  addNews(`Fichaje: ${p.name} llega por ${formatMoney(p.value)}`);
-  addInbox("Secretaría Técnica","Fichaje cerrado",`${p.name} ya está en la plantilla.`);
-  updateAll();
-  saveGame();
+  state.budget-=p.value/1000; state.players.push({...p,club:undefined}); state.teams[state.userClubId].players=state.players;
+  state.transferList.splice(idx,1); addNews(`Fichaje: ${p.name} llega por ${formatMoney(p.value)}`);
+  addInbox("Secretaría Técnica","Fichaje cerrado",`${p.name} ya está en la plantilla.`); updateAll(); saveGame();
 }
 
 function sellPlayer(id){
-  const idx = state.players.findIndex(p => p.id === id);
-  if(idx === -1) return;
-  const p = state.players[idx];
-  const li = state.lineup.indexOf(id);
-  if(li !== -1) state.lineup[li] = null;
-  const offer = Math.round(p.value * (0.7 + Math.random()*0.4));
+  const idx=state.players.findIndex(p=>p.id===id); if(idx===-1) return;
+  const p=state.players[idx]; const li=state.lineup.indexOf(id); if(li!==-1) state.lineup[li]=null;
+  const offer=Math.round(p.value*(0.7+Math.random()*0.4));
   if(!confirm(`Oferta recibida por ${p.name}: ${formatMoney(offer)}.\n¿Aceptar venta?`)) return;
-  state.budget += offer / 1000;
-  state.players.splice(idx, 1);
-  state.teams[state.userClubId].players = state.players;
+  state.budget+=offer/1000; state.players.splice(idx,1); state.teams[state.userClubId].players=state.players;
   addNews(`Venta: ${p.name} se marcha por ${formatMoney(offer)}`);
-  addInbox("Secretaría Técnica","Venta cerrada",`${p.name} ha sido transferido. Presupuesto actualizado.`);
-  updateAll();
-  saveGame();
+  addInbox("Secretaría Técnica","Venta cerrada",`${p.name} ha sido transferido.`); updateAll(); saveGame();
 }
 
 function applyTraining(){
-  if(state.trainingApplied){ alert("Ya aplicado esta semana."); return; }
-  const intensity = document.getElementById("train-intensity").value;
-  const focus = document.getElementById("train-focus").value;
-  const mods = {
-    recovery: {cond:12, morale:3, risk:0.01},
-    light: {cond:6, morale:2, risk:0.02},
-    medium: {cond:0, morale:0, risk:0.04},
-    high: {cond:-6, morale:-2, risk:0.08},
-    double: {cond:-12, morale:-4, risk:0.14}
-  }[intensity];
-
-  state.players.forEach(p => {
+  if(state.trainingApplied){alert("Ya aplicado esta semana.");return;}
+  const intensity=document.getElementById("train-intensity").value, focus=document.getElementById("train-focus").value;
+  const mods={recovery:{cond:12,morale:3,risk:0.01},light:{cond:6,morale:2,risk:0.02},medium:{cond:0,morale:0,risk:0.04},high:{cond:-6,morale:-2,risk:0.08},double:{cond:-12,morale:-4,risk:0.14}}[intensity];
+  state.players.forEach(p=>{
     if(p.injured) return;
-    p.condition = clamp(p.condition + mods.cond + rand(-3,3), 40, 100);
-    p.morale = clamp(p.morale + mods.morale + rand(-2,2), 25, 100);
-    if(Math.random() < mods.risk) p.injured = true;
-    if(p.age < 24 && focus !== "recovery" && Math.random() < 0.15) p.ca = clamp(p.ca + 1, 45, p.pa);
+    p.condition=clamp(p.condition+mods.cond+rand(-3,3),40,100);
+    p.morale=clamp(p.morale+mods.morale+rand(-2,2),25,100);
+    if(Math.random()<mods.risk) p.injured=true;
+    if(p.age<24&&focus!=="recovery"&&Math.random()<0.15) p.ca=clamp(p.ca+1,45,p.pa);
   });
-  state.trainingApplied = true;
-  document.getElementById("train-status").textContent = `Aplicado: ${intensity} / ${focus}`;
-  addNews(`Entrenamiento (${intensity}) completado.`);
-  updateAll();
-  saveGame();
+  state.trainingApplied=true;
+  document.getElementById("train-status").textContent=`Aplicado: ${intensity} / ${focus}`;
+  addNews(`Entrenamiento (${intensity}) completado.`); updateAll(); saveGame();
 }
 
 function showScreen(id){
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.screen === id));
-  if(id === "squad") renderSquad();
-  if(id === "tactics"){ renderPitch(); renderLineupPlayers(); }
-  if(id === "league") renderStandings();
-  if(id === "transfers") renderTransfers();
-  if(id === "inbox") renderInbox();
-  if(id === "dashboard") renderDashboard();
-  if(id === "copa") renderCopa();
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.screen===id));
+  if(id==="squad") renderSquad();
+  if(id==="tactics"){ renderPitch(); renderLineupPlayers(); }
+  if(id==="league") renderStandings();
+  if(id==="transfers") renderTransfers();
+  if(id==="inbox") renderInbox();
+  if(id==="dashboard") renderDashboard();
+  if(id==="copa") renderCopa();
 }
 
-function updateAll(){
-  updateHeader();
-  renderDashboard();
-  renderSquad();
-  renderPitch();
-  renderLineupPlayers();
-  renderStandings();
-  renderTransfers();
-  renderInbox();
-  renderCopa();
-}
+function updateAll(){ updateHeader(); renderDashboard(); renderSquad(); renderPitch(); renderLineupPlayers(); renderStandings(); renderTransfers(); renderInbox(); renderCopa(); }
 
-function saveGame(){
-  try{ localStorage.setItem("fm26web_save", JSON.stringify(state)); } catch(e){}
-}
-
+function saveGame(){ try{ localStorage.setItem("fm26web_save",JSON.stringify(state)); }catch(e){} }
 function loadGame(){
   try{
-    const raw = localStorage.getItem("fm26web_save");
-    if(!raw) return false;
-    const data = JSON.parse(raw);
-    if(!data.userClubId || !data.teams) return false;
-    Object.assign(state, data);
-    if(!state.squadSortBy) state.squadSortBy = "ca";
-    if(!state.squadSortDir) state.squadSortDir = "desc";
-    if(!state.lineup || !Array.isArray(state.lineup)) state.lineup = Array(11).fill(null);
-    state.selectedSlot = null;
-    return true;
-  } catch(e){ return false; }
+    const raw=localStorage.getItem("fm26web_save"); if(!raw) return false;
+    const data=JSON.parse(raw); if(!data.userClubId||!data.teams) return false;
+    Object.assign(state,data);
+    if(!state.squadSortBy) state.squadSortBy="ca"; if(!state.squadSortDir) state.squadSortDir="desc";
+    if(!state.lineup||!Array.isArray(state.lineup)) state.lineup=Array(11).fill(null);
+    state.selectedSlot=null; return true;
+  }catch(e){ return false; }
 }
-
-function hasSave(){
-  try{
-    const r = localStorage.getItem("fm26web_save");
-    return !!(r && JSON.parse(r).userClubId);
-  } catch(e){ return false; }
-}
+function hasSave(){ try{ const r=localStorage.getItem("fm26web_save"); return !!(r&&JSON.parse(r).userClubId); }catch(e){ return false; } }
 
 function renderClubSelect(){
-  document.getElementById("club-select-grid").innerHTML = CLUBS.map(c => `
-    <div class="club-card" data-id="${c.id}">
-      <div class="cname">${c.name}</div>
-      <div class="cmanager">👔 ${c.manager}</div>
-      <div class="cstats">Rating <strong>${c.rating}</strong> · Presupuesto <strong>${formatMoney(c.budget*1000)}</strong><br>
-      Asistencia media: ${c.att.toLocaleString()}</div>
-    </div>`).join("");
-
-  document.querySelectorAll(".club-card").forEach(card => {
-    card.onclick = () => {
-      document.querySelectorAll(".club-card").forEach(c => c.classList.remove("selected"));
-      card.classList.add("selected");
-      state.selectedClubId = card.dataset.id;
-      document.getElementById("btn-start-game").disabled = false;
-    };
+  document.getElementById("club-select-grid").innerHTML=CLUBS.map(c=>`
+    <div class="club-card" data-id="${c.id}"><div class="cname">${c.name}</div><div class="cmanager">👔 ${c.manager}</div>
+    <div class="cstats">Rating <strong>${c.rating}</strong> · Presupuesto <strong>${formatMoney(c.budget*1000)}</strong><br>Asistencia media: ${c.att.toLocaleString()}</div></div>`).join("");
+  document.querySelectorAll(".club-card").forEach(card=>{
+    card.onclick=()=>{ document.querySelectorAll(".club-card").forEach(c=>c.classList.remove("selected")); card.classList.add("selected"); state.selectedClubId=card.dataset.id; document.getElementById("btn-start-game").disabled=false; };
   });
 }
 
 function showMainMenu(){
   document.getElementById("start-menu").classList.remove("hidden");
   document.getElementById("game-ui").classList.remove("visible");
-  document.getElementById("main-menu-view").style.display = "flex";
+  document.getElementById("main-menu-view").style.display="flex";
   document.getElementById("club-select-view").classList.remove("visible");
-  const has = hasSave();
-  document.getElementById("btn-continue-career").style.display = has ? "block" : "none";
-  document.getElementById("save-info").textContent = has ? "Hay una partida guardada disponible." : "No hay partida guardada.";
+  const has=hasSave();
+  document.getElementById("btn-continue-career").style.display=has?"block":"none";
+  document.getElementById("save-info").textContent=has?"Hay una partida guardada disponible.":"No hay partida guardada.";
 }
 
 function startNewGame(){
   if(!state.selectedClubId) return;
-
-  state.userClubId = state.selectedClubId;
-  state.matchday = 1;
-  state.morale = 75;
-  state.formation = "4-2-3-1";
-  state.mentality = "balanced";
-  state.style = "gegenpress";
-  state.pressing = 70;
-  state.defLine = "standard";
-  state.tempo = "standard";
-  state.news = [];
-  state.inbox = [];
-  state.matchPlayedThisMD = false;
-  state.trainingApplied = false;
-  state.squadSortBy = "ca";
-  state.squadSortDir = "desc";
-  state.lineup = Array(11).fill(null);
-  state.selectedSlot = null;
-
-  initTeams();
-  state.players = state.teams[state.userClubId].players;
-  state.budget = state.teams[state.userClubId].budget;
-  generateFixtures();
-  generateTransferList();
-  initCopa();
-  autoSelectLineup();
-
-  const club = state.teams[state.userClubId];
+  state.userClubId=state.selectedClubId; state.matchday=1; state.morale=75;
+  state.formation="4-2-3-1"; state.mentality="balanced"; state.style="gegenpress"; state.pressing=70;
+  state.defLine="standard"; state.tempo="standard"; state.news=[]; state.inbox=[];
+  state.matchPlayedThisMD=false; state.trainingApplied=false; state.squadSortBy="ca"; state.squadSortDir="desc";
+  state.lineup=Array(11).fill(null); state.selectedSlot=null;
+  initTeams(); state.players=state.teams[state.userClubId].players; state.budget=state.teams[state.userClubId].budget;
+  generateFixtures(); generateTransferList(); initCopa(); autoSelectLineup();
+  const club=state.teams[state.userClubId];
   addNews(`Bienvenido a la 2025/26. Diriges al ${club.name} (${club.manager}).`);
   addInbox("Presidencia","Objetivos",`Presupuesto de fichajes: ${formatMoney(state.budget*1000)}. ¡Éxito en Liga y Copa del Rey!`);
-
   document.getElementById("start-menu").classList.add("hidden");
   document.getElementById("game-ui").classList.add("visible");
-  updateAll();
-  showScreen("dashboard");
-  saveGame();
+  updateAll(); showScreen("dashboard"); saveGame();
 }
 
 function continueCareer(){
   if(!loadGame()){ alert("No se pudo cargar la partida."); return; }
   document.getElementById("start-menu").classList.add("hidden");
   document.getElementById("game-ui").classList.add("visible");
-  updateAll();
-  showScreen("dashboard");
+  updateAll(); showScreen("dashboard");
 }
 
 // ========== EVENTOS ==========
-document.querySelectorAll("nav button").forEach(btn => {
-  btn.addEventListener("click", () => showScreen(btn.dataset.screen));
-});
-
-document.getElementById("btn-continue").onclick = () => {
+document.querySelectorAll("nav button").forEach(btn=>btn.addEventListener("click",()=>showScreen(btn.dataset.screen)));
+document.getElementById("btn-continue").onclick=()=>{
   if(state.matchPlayedThisMD) nextMatchday();
   else {
     showScreen("match");
-    const md = state.fixtures[state.matchday-1] || [];
-    const f = md.find(x => x.home === state.userClubId || x.away === state.userClubId);
+    const md=state.fixtures[state.matchday-1]||[];
+    const f=md.find(x=>x.home===state.userClubId||x.away===state.userClubId);
     if(f){
-      document.getElementById("match-home").textContent = state.teams[f.home].name;
-      document.getElementById("match-away").textContent = state.teams[f.away].name;
-      document.getElementById("match-score").textContent = "0 - 0";
-      document.getElementById("match-events").innerHTML = "";
-      document.getElementById("match-status").textContent = "Listo para comenzar";
-      document.getElementById("btn-sim-match").style.display = "inline-block";
-      document.getElementById("btn-next-matchday").style.display = "none";
+      document.getElementById("match-home").textContent=state.teams[f.home].name;
+      document.getElementById("match-away").textContent=state.teams[f.away].name;
+      document.getElementById("match-score").textContent="0 - 0";
+      document.getElementById("match-events").innerHTML="";
+      document.getElementById("match-status").textContent="Listo para comenzar";
+      document.getElementById("btn-sim-match").style.display="inline-block";
+      document.getElementById("btn-next-matchday").style.display="none";
     }
   }
 };
-
-document.getElementById("btn-sim-match").onclick = playUserMatch;
-document.getElementById("btn-next-matchday").onclick = nextMatchday;
-document.getElementById("squad-filter").onchange = renderSquad;
-
-document.getElementById("formation-select").onchange = e => {
-  state.formation = e.target.value;
-  state.lineup = Array((FORMATIONS[state.formation] || []).length).fill(null);
-  state.selectedSlot = null;
-  renderPitch();
-  renderLineupPlayers();
-};
-
-document.getElementById("pressing").oninput = e => {
-  state.pressing = +e.target.value;
-  document.getElementById("press-bar").style.width = state.pressing + "%";
-};
-
-document.getElementById("btn-save-tactics").onclick = () => {
-  state.mentality = document.getElementById("mentality").value;
-  state.style = document.getElementById("style").value;
-  state.defLine = document.getElementById("def-line").value;
-  state.tempo = document.getElementById("tempo").value;
-  document.getElementById("tactics-feedback").textContent = "✓ Táctica y alineación guardadas";
-  setTimeout(() => document.getElementById("tactics-feedback").textContent = "", 2500);
-  saveGame();
-};
-
-document.getElementById("btn-auto-xi").onclick = () => { autoSelectLineup(); saveGame(); };
-document.getElementById("btn-clear-xi").onclick = () => { clearLineup(); saveGame(); };
-document.getElementById("btn-apply-training").onclick = applyTraining;
-
-document.getElementById("btn-new-career").onclick = () => {
-  document.getElementById("main-menu-view").style.display = "none";
-  document.getElementById("club-select-view").classList.add("visible");
-  state.selectedClubId = null;
-  document.getElementById("btn-start-game").disabled = true;
-  renderClubSelect();
-};
-
-document.getElementById("btn-back-menu").onclick = showMainMenu;
-document.getElementById("btn-start-game").onclick = startNewGame;
-document.getElementById("btn-continue-career").onclick = continueCareer;
-document.getElementById("btn-save").onclick = () => { saveGame(); alert("Partida guardada."); };
-document.getElementById("btn-new-game").onclick = () => {
-  if(confirm("¿Volver al menú principal? (puedes guardar antes)")){
-    saveGame();
-    showMainMenu();
-  }
-};
-
-document.querySelectorAll("#squad thead th[data-sort]").forEach(th => {
-  th.addEventListener("click", () => {
-    const key = th.dataset.sort;
-    if(state.squadSortBy === key){
-      state.squadSortDir = state.squadSortDir === "asc" ? "desc" : "asc";
-    } else {
-      state.squadSortBy = key;
-      state.squadSortDir = (key === "name" || key === "pos") ? "asc" : "desc";
-    }
-    renderSquad();
-    saveGame();
+document.getElementById("btn-sim-match").onclick=playUserMatch;
+document.getElementById("btn-next-matchday").onclick=nextMatchday;
+document.getElementById("squad-filter").onchange=renderSquad;
+document.getElementById("formation-select").onchange=e=>{ state.formation=e.target.value; state.lineup=Array((FORMATIONS[state.formation]||[]).length).fill(null); state.selectedSlot=null; renderPitch(); renderLineupPlayers(); };
+document.getElementById("pressing").oninput=e=>{ state.pressing=+e.target.value; document.getElementById("press-bar").style.width=state.pressing+"%"; };
+document.getElementById("btn-save-tactics").onclick=()=>{ state.mentality=document.getElementById("mentality").value; state.style=document.getElementById("style").value; state.defLine=document.getElementById("def-line").value; state.tempo=document.getElementById("tempo").value; document.getElementById("tactics-feedback").textContent="✓ Táctica y alineación guardadas"; setTimeout(()=>document.getElementById("tactics-feedback").textContent="",2500); saveGame(); };
+document.getElementById("btn-auto-xi").onclick=()=>{ autoSelectLineup(); saveGame(); };
+document.getElementById("btn-clear-xi").onclick=()=>{ clearLineup(); saveGame(); };
+document.getElementById("btn-apply-training").onclick=applyTraining;
+document.getElementById("btn-new-career").onclick=()=>{ document.getElementById("main-menu-view").style.display="none"; document.getElementById("club-select-view").classList.add("visible"); state.selectedClubId=null; document.getElementById("btn-start-game").disabled=true; renderClubSelect(); };
+document.getElementById("btn-back-menu").onclick=showMainMenu;
+document.getElementById("btn-start-game").onclick=startNewGame;
+document.getElementById("btn-continue-career").onclick=continueCareer;
+document.getElementById("btn-save").onclick=()=>{ saveGame(); alert("Partida guardada."); };
+document.getElementById("btn-new-game").onclick=()=>{ if(confirm("¿Volver al menú principal? (puedes guardar antes)")){ saveGame(); showMainMenu(); } };
+document.querySelectorAll("#squad thead th[data-sort]").forEach(th=>{
+  th.addEventListener("click",()=>{
+    const key=th.dataset.sort;
+    if(state.squadSortBy===key) state.squadSortDir=state.squadSortDir==="asc"?"desc":"asc";
+    else { state.squadSortBy=key; state.squadSortDir=(key==="name"||key==="pos")?"asc":"desc"; }
+    renderSquad(); saveGame();
   });
 });
+document.getElementById("tab-free").onclick=()=>{ document.getElementById("free-market").style.display="block"; document.getElementById("clubs-market").style.display="none"; document.getElementById("tab-free").classList.add("btn"); document.getElementById("tab-free").classList.remove("secondary"); document.getElementById("tab-clubs").classList.add("secondary"); document.getElementById("tab-clubs").classList.remove("btn"); };
+document.getElementById("tab-clubs").onclick=()=>{ document.getElementById("free-market").style.display="none"; document.getElementById("clubs-market").style.display="block"; document.getElementById("tab-clubs").classList.add("btn"); document.getElementById("tab-clubs").classList.remove("secondary"); document.getElementById("tab-free").classList.add("secondary"); document.getElementById("tab-free").classList.remove("btn"); renderClubSelectForTransfers(); };
 
-// Pestañas del mercado
-document.getElementById("tab-free").onclick = () => {
-  document.getElementById("free-market").style.display = "block";
-  document.getElementById("clubs-market").style.display = "none";
-  document.getElementById("tab-free").classList.add("btn");
-  document.getElementById("tab-free").classList.remove("secondary");
-  document.getElementById("tab-clubs").classList.add("secondary");
-  document.getElementById("tab-clubs").classList.remove("btn");
-};
+// Modal jugador
+document.getElementById("close-player-modal").onclick=closePlayerModal;
+document.getElementById("player-modal").addEventListener("click",e=>{ if(e.target.id==="player-modal") closePlayerModal(); });
+document.getElementById("btn-upload-photo").onclick=()=>document.getElementById("photo-file-input").click();
+document.getElementById("photo-file-input").onchange=e=>{ const file=e.target.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=ev=>setPlayerPhoto(ev.target.result); reader.readAsDataURL(file); };
+document.getElementById("btn-url-photo").onclick=()=>{ const url=prompt("Pega la URL de la imagen del jugador:"); if(url) setPlayerPhoto(url); };
+document.getElementById("btn-remove-photo").onclick=()=>setPlayerPhoto(null);
 
-document.getElementById("tab-clubs").onclick = () => {
-  document.getElementById("free-market").style.display = "none";
-  document.getElementById("clubs-market").style.display = "block";
-  document.getElementById("tab-clubs").classList.add("btn");
-  document.getElementById("tab-clubs").classList.remove("secondary");
-  document.getElementById("tab-free").classList.add("secondary");
-  document.getElementById("tab-free").classList.remove("btn");
-  renderClubSelectForTransfers();
-};
-
-// Iniciar
 showMainMenu();
 </script>
 </body>
