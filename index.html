@@ -676,7 +676,16 @@ function generatePlayer(pos, quality=70, name=null, mv=null){
     value: Math.max(5, value),
     wage: Math.round(value*0.012 + rand(5,40)),
     injured: Math.random() < 0.04,
-    form: rand(5,9)
+    form: rand(5,9),
+    // Estadísticas avanzadas
+    apps: 0,
+    goals: 0,
+    assists: 0,
+    yellows: 0,
+    reds: 0,
+    motm: 0,
+    ratingSum: 0,
+    avgRating: 0
   };
 }
 
@@ -884,14 +893,10 @@ function simulateMatch(homeId, awayId) {
   const homeStr = calcTeamStrength(homeId, homeId === state.userClubId);
   const awayStr = calcTeamStrength(awayId, awayId === state.userClubId);
 
-  // Ventaja de local realista (~0.35-0.45 goles de diferencia esperada)
   const homeAdv = 0.38;
-
-  // Expected goals base
   let hExp = 1.15 + (homeStr - 70) * 0.038 + homeAdv;
   let aExp = 1.05 + (awayStr - 70) * 0.036;
 
-  // Ajuste por diferencia de calidad (los favoritos dominan más)
   const diff = homeStr - awayStr;
   if (diff > 12) {
     hExp += (diff - 12) * 0.045;
@@ -901,7 +906,6 @@ function simulateMatch(homeId, awayId) {
     hExp -= (-diff - 12) * 0.025;
   }
 
-  // Mentalidad ofensiva/defensiva del usuario afecta más
   if (homeId === state.userClubId) {
     if (state.mentality === "attacking") { hExp += 0.28; aExp += 0.12; }
     if (state.mentality === "defensive") { hExp -= 0.22; aExp -= 0.18; }
@@ -911,13 +915,10 @@ function simulateMatch(homeId, awayId) {
     if (state.mentality === "defensive") { aExp -= 0.22; hExp -= 0.18; }
   }
 
-  // Evitar valores absurdos
   hExp = clamp(hExp, 0.35, 3.4);
   aExp = clamp(aExp, 0.30, 3.2);
 
-  // Función de goles más realista (distribución tipo Poisson suavizada)
   function generateGoals(exp) {
-    // Usamos una aproximación discreta más controlada
     const r = Math.random();
     if (exp < 0.7) {
       if (r < 0.52) return 0;
@@ -945,7 +946,6 @@ function simulateMatch(homeId, awayId) {
       if (r < 0.97) return 4;
       return 5;
     }
-    // Partidos muy ofensivos
     if (r < 0.06) return 0;
     if (r < 0.22) return 1;
     if (r < 0.48) return 2;
@@ -957,7 +957,6 @@ function simulateMatch(homeId, awayId) {
   let hg = generateGoals(hExp);
   let ag = generateGoals(aExp);
 
-  // Reducir ligeramente la probabilidad de resultados muy locos
   if (hg + ag >= 6 && Math.random() < 0.55) {
     if (hg > ag) hg--;
     else if (ag > hg) ag--;
@@ -965,7 +964,6 @@ function simulateMatch(homeId, awayId) {
     else ag--;
   }
 
-  // Eventos del partido
   const events = [];
   const homeName = state.teams[homeId]?.name || homeId;
   const awayName = state.teams[awayId]?.name || awayId;
@@ -985,11 +983,33 @@ function simulateMatch(homeId, awayId) {
   const attackPos = ["DC", "DI", "DD", "EI", "ED", "MP"];
   const midPos = ["MC", "MI", "MD", "PIV", "CI", "CD"];
 
-  // Generar minutos de los goles
-  const goalMinutes = [];
-  for (let i = 0; i < hg + ag; i++) {
-    goalMinutes.push(rand(4, 93));
+  // --- Actualizar partidos jugados y nota base ---
+  function updateAppsAndRating(players, goalsFor, goalsAgainst, isHome) {
+    players.forEach(p => {
+      p.apps = (p.apps || 0) + 1;
+
+      // Nota base según resultado
+      let rating = 6.3 + Math.random() * 0.8;
+      if (goalsFor > goalsAgainst) rating += 0.6 + Math.random() * 0.5;
+      else if (goalsFor === goalsAgainst) rating += 0.15;
+      else rating -= 0.4 + Math.random() * 0.5;
+
+      // Bonus por calidad
+      rating += (p.ca - 140) * 0.008;
+      rating = clamp(rating, 5.0, 9.7);
+
+      p.ratingSum = (p.ratingSum || 0) + rating;
+      p.avgRating = p.apps > 0 ? (p.ratingSum / p.apps) : 0;
+      p._lastRating = rating; // temporal para elegir MVP
+    });
   }
+
+  updateAppsAndRating(homePlayers, hg, ag, true);
+  updateAppsAndRating(awayPlayers, ag, hg, false);
+
+  // --- Goles y asistencias ---
+  const goalMinutes = [];
+  for (let i = 0; i < hg + ag; i++) goalMinutes.push(rand(4, 93));
   goalMinutes.sort((a, b) => a - b);
 
   let hs = 0, as_ = 0;
@@ -1000,37 +1020,87 @@ function simulateMatch(homeId, awayId) {
       let pool = homePlayers.filter(p => attackPos.includes(p.pos));
       if (pool.length === 0) pool = homePlayers.filter(p => midPos.includes(p.pos));
       if (pool.length === 0) pool = homePlayers;
-      const scorer = pool.length ? pick(pool) : { name: "Jugador" };
-      events.push({ min, type: "goal", text: `⚽ GOL! ${scorer.name} (${homeName})` });
+      const scorer = pool.length ? pick(pool) : null;
+
+      if (scorer) {
+        scorer.goals = (scorer.goals || 0) + 1;
+        scorer._lastRating = Math.min(9.8, (scorer._lastRating || 6.5) + 1.1);
+        events.push({ min, type: "goal", text: `⚽ GOL! ${scorer.name} (${homeName})` });
+
+        // Asistencia (60% de probabilidad)
+        if (Math.random() < 0.60 && homePlayers.length > 1) {
+          const assisters = homePlayers.filter(p => p.id !== scorer.id);
+          const assister = pick(assisters);
+          assister.assists = (assister.assists || 0) + 1;
+          assister._lastRating = Math.min(9.5, (assister._lastRating || 6.5) + 0.5);
+        }
+      }
       hs++;
     } else if (as_ < ag) {
       let pool = awayPlayers.filter(p => attackPos.includes(p.pos));
       if (pool.length === 0) pool = awayPlayers.filter(p => midPos.includes(p.pos));
       if (pool.length === 0) pool = awayPlayers;
-      const scorer = pool.length ? pick(pool) : { name: "Jugador" };
-      events.push({ min, type: "goal", text: `⚽ GOL! ${scorer.name} (${awayName})` });
+      const scorer = pool.length ? pick(pool) : null;
+
+      if (scorer) {
+        scorer.goals = (scorer.goals || 0) + 1;
+        scorer._lastRating = Math.min(9.8, (scorer._lastRating || 6.5) + 1.1);
+        events.push({ min, type: "goal", text: `⚽ GOL! ${scorer.name} (${awayName})` });
+
+        if (Math.random() < 0.60 && awayPlayers.length > 1) {
+          const assisters = awayPlayers.filter(p => p.id !== scorer.id);
+          const assister = pick(assisters);
+          assister.assists = (assister.assists || 0) + 1;
+          assister._lastRating = Math.min(9.5, (assister._lastRating || 6.5) + 0.5);
+        }
+      }
       as_++;
     }
   });
 
-  // Tarjetas (menos frecuentes y más realistas)
+  // --- Tarjetas ---
   const numCards = rand(1, 4);
   for (let i = 0; i < numCards; i++) {
     const min = rand(12, 90);
     const isHome = Math.random() < 0.5;
     const pl = isHome ? homePlayers : awayPlayers;
     const teamName = isHome ? homeName : awayName;
-    const p = pl.length ? pick(pl) : { name: "Jugador" };
+    const p = pl.length ? pick(pl) : null;
+    if (!p) continue;
 
     if (Math.random() < 0.88) {
+      p.yellows = (p.yellows || 0) + 1;
+      p._lastRating = Math.max(5.0, (p._lastRating || 6.5) - 0.4);
       events.push({ min, type: "card-y", text: `🟨 ${p.name} (${teamName})` });
     } else {
+      p.reds = (p.reds || 0) + 1;
+      p._lastRating = Math.max(4.5, (p._lastRating || 6.5) - 1.5);
       events.push({ min, type: "card-r", text: `🟥 ¡Roja! ${p.name} (${teamName})` });
     }
   }
 
-  events.sort((a, b) => a.min - b.min);
+  // --- MVP del partido ---
+  const allPlayers = [...homePlayers, ...awayPlayers];
+  if (allPlayers.length > 0) {
+    allPlayers.sort((a, b) => (b._lastRating || 0) - (a._lastRating || 0));
+    const motm = allPlayers[0];
+    if (motm) {
+      motm.motm = (motm.motm || 0) + 1;
+      motm._lastRating = Math.min(9.9, (motm._lastRating || 7) + 0.3);
+    }
+  }
 
+  // Recalcular media de rating después de los bonus
+  [...homePlayers, ...awayPlayers].forEach(p => {
+    if (p._lastRating) {
+      // Re-ajustar el ratingSum con el rating final
+      p.ratingSum = (p.ratingSum || 0) - (p.avgRating || 6.5) + p._lastRating;
+      p.avgRating = p.apps > 0 ? (p.ratingSum / p.apps) : 0;
+      delete p._lastRating;
+    }
+  });
+
+  events.sort((a, b) => a.min - b.min);
   return { homeGoals: hg, awayGoals: ag, events };
 }
 
@@ -1118,29 +1188,10 @@ function renderDashboard(){
   ).join("") || "<div style='color:var(--muted)'>Sin noticias.</div>";
 }
 
-function sortSquadList(list){
-  const by = state.squadSortBy;
-  const dir = state.squadSortDir === "asc" ? 1 : -1;
-  return [...list].sort((a,b) => {
-    let va, vb;
-    switch(by){
-      case "pos": va = POS_ORDER[a.pos]||99; vb = POS_ORDER[b.pos]||99; break;
-      case "name": return dir * a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-      case "age": va=a.age; vb=b.age; break;
-      case "ca": va=a.ca; vb=b.ca; break;
-      case "pa": va=a.pa; vb=b.pa; break;
-      case "condition": va=a.condition; vb=b.condition; break;
-      case "morale": va=a.morale; vb=b.morale; break;
-      case "value": va=a.value; vb=b.value; break;
-      case "wage": va=a.wage; vb=b.wage; break;
-      case "status": va=a.injured?1:0; vb=b.injured?1:0; break;
-      default: va=a.ca; vb=b.ca;
-    }
-    if(va < vb) return -1 * dir;
-    if(va > vb) return 1 * dir;
-    return b.ca - a.ca;
-  });
-}
+case "goals": va = a.goals||0; vb = b.goals||0; break;
+case "assists": va = a.assists||0; vb = b.assists||0; break;
+case "apps": va = a.apps||0; vb = b.apps||0; break;
+case "rating": va = a.avgRating||0; vb = b.avgRating||0; break;
 
 function updateSortHeaders(){
   document.querySelectorAll("#squad thead th[data-sort]").forEach(th => {
@@ -1160,10 +1211,16 @@ function renderSquad(){
 
   list = sortSquadList(list);
   updateSortHeaders();
+
   document.getElementById("squad-table").innerHTML = list.map(p => `
     <tr>
       <td class="pos ${p.pos}">${p.pos}</td>
-      <td>${p.name}</td>
+      <td>
+        <div style="font-weight:600">${p.name}</div>
+        <div style="font-size:.72rem;color:var(--muted)">
+          ${p.apps||0} pj · ${p.goals||0} goles · ${p.assists||0} asis
+        </div>
+      </td>
       <td>${p.age}</td>
       <td class="rating">${p.ca}</td>
       <td class="stat">${p.pa}</td>
@@ -1171,7 +1228,10 @@ function renderSquad(){
       <td class="stat">${p.morale}%</td>
       <td>${formatMoney(p.value)}</td>
       <td>${formatMoney(p.wage)}/sem</td>
-      <td>${p.injured ? '<span class="injury">Lesionado</span>' : '<span class="badge">Disponible</span>'}</td>
+      <td>
+        ${p.injured ? '<span class="injury">Lesionado</span>' : '<span class="badge">Disponible</span>'}
+        ${p.avgRating ? `<div style="font-size:.72rem;color:var(--accent);margin-top:2px">★ ${p.avgRating.toFixed(2)}</div>` : ''}
+      </td>
       <td><button class="btn danger" style="padding:4px 8px;font-size:.75rem" onclick="sellPlayer('${p.id}')">Vender</button></td>
     </tr>`).join("");
 }
