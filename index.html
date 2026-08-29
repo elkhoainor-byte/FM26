@@ -27,7 +27,13 @@ th:hover{color:var(--accent)}
 th.sorted{color:var(--accent)}
 th .arrow{font-size:.7rem;margin-left:3px;opacity:.85}
 tr:hover td{background:rgba(255,255,255,.03)}
-.pos{font-weight:700;width:36px}.pos.GK{color:#f39c12}.pos.DEF{color:#3498db}.pos.MID{color:#2ecc71}.pos.ATT{color:#e74c3c}
+.pos{font-weight:700;width:42px;font-size:.78rem}
+.pos.GK{color:#f39c12}
+.pos.LI,.pos.LD,.pos.CI,.pos.CD{color:#3498db}
+.pos.DFC{color:#2980b9}
+.pos.PIV,.pos.MI,.pos.MC,.pos.MD{color:#2ecc71}
+.pos.EI,.pos.ED,.pos.MP{color:#e67e22}
+.pos.DI,.pos.DC,.pos.DD{color:#e74c3c}
 .stat{font-variant-numeric:tabular-nums}.rating{font-weight:700;color:var(--accent)}
 .btn{background:var(--accent);color:#0a1628;border:none;padding:10px 18px;border-radius:6px;font-weight:700;cursor:pointer;font-size:.9rem;transition:transform .1s,filter .15s}
 .btn:hover{filter:brightness(1.1)}.btn:active{transform:scale(.97)}
@@ -94,7 +100,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:.8rem}
 .lineup-player{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:.84rem;border:1px solid transparent;margin-bottom:3px}
 .lineup-player:hover{background:rgba(0,212,170,.1);border-color:var(--border)}
 .lineup-player.in-xi{opacity:.45;pointer-events:none}
-.lineup-player .ppos{font-weight:700;width:28px}
+.lineup-player .ppos{font-weight:700;width:36px;font-size:.75rem}
 .lineup-hint{font-size:.8rem;color:var(--muted);margin-bottom:8px;padding:8px;background:rgba(0,0,0,.25);border-radius:6px}
 </style>
 </head>
@@ -181,11 +187,18 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:.8rem}
         <select id="squad-filter" style="width:auto">
           <option value="all">Todos</option>
           <option value="GK">Porteros</option>
+          <option value="DEF">Defensas (LI/DFC/LD)</option>
+          <option value="WB">Carrileros (CI/CD)</option>
+          <option value="MID">Mediocentros (PIV/MI/MC/MD)</option>
+          <option value="ATT">Ataque (EI/MP/ED/DI/DC/DD)</option>
           <option value="LI">Laterales izquierdos</option>
           <option value="DFC">Defensas centrales</option>
           <option value="LD">Laterales derechos</option>
-          <option value="MID">Centrocampistas</option>
-          <option value="ATT">Delanteros</option>
+          <option value="PIV">Pivotes</option>
+          <option value="MC">Mediocentros</option>
+          <option value="EI">Extremos izquierdos</option>
+          <option value="ED">Extremos derechos</option>
+          <option value="DC">Delanteros centros</option>
         </select>
       </div>
       <table>
@@ -407,78 +420,128 @@ const CLUBS = [
 
 const STAR_PLAYERS = {
   rm: [
-    {name:"Kylian Mbappé",pos:"ATT",age:27,ca:190,pa:192,mv:180},
-    {name:"Jude Bellingham",pos:"MID",age:23,ca:175,pa:185,mv:160},
-    {name:"Vinícius Júnior",pos:"ATT",age:26,ca:178,pa:185,mv:170},
-    {name:"Federico Valverde",pos:"MID",age:27,ca:168,pa:175,mv:130},
+    {name:"Kylian Mbappé",pos:"DC",age:27,ca:190,pa:192,mv:180},
+    {name:"Jude Bellingham",pos:"MP",age:23,ca:175,pa:185,mv:160},
+    {name:"Vinícius Júnior",pos:"EI",age:26,ca:178,pa:185,mv:170},
+    {name:"Federico Valverde",pos:"MC",age:27,ca:168,pa:175,mv:130},
     {name:"Thibaut Courtois",pos:"GK",age:34,ca:168,pa:170,mv:25},
-    {name:"Aurélien Tchouaméni",pos:"MID",age:26,ca:162,pa:172,mv:75},
-    {name:"Rodrygo",pos:"ATT",age:25,ca:160,pa:172,mv:90},
-    {name:"Eduardo Camavinga",pos:"MID",age:23,ca:158,pa:175,mv:70},
-    {name:"Éder Militão",pos:"DEF",age:28,ca:155,pa:162,mv:40},
-    {name:"Antonio Rüdiger",pos:"DEF",age:33,ca:150,pa:152,mv:12},
-    {name:"Trent Alexander-Arnold",pos:"DEF",age:27,ca:155,pa:162,mv:65},
-    {name:"Arda Güler",pos:"MID",age:21,ca:155,pa:180,mv:90},
-    {name:"Dean Huijsen",pos:"DEF",age:21,ca:148,pa:175,mv:65}
+    {name:"Aurélien Tchouaméni",pos:"PIV",age:26,ca:162,pa:172,mv:75},
+    {name:"Rodrygo",pos:"ED",age:25,ca:160,pa:172,mv:90},
+    {name:"Eduardo Camavinga",pos:"MC",age:23,ca:158,pa:175,mv:70},
+    {name:"Éder Militão",pos:"DFC",age:28,ca:155,pa:162,mv:40},
+    {name:"Antonio Rüdiger",pos:"DFC",age:33,ca:150,pa:152,mv:12},
+    {name:"Trent Alexander-Arnold",pos:"LD",age:27,ca:155,pa:162,mv:65},
+    {name:"Arda Güler",pos:"MP",age:21,ca:155,pa:180,mv:90},
+    {name:"Dean Huijsen",pos:"DFC",age:21,ca:148,pa:175,mv:65}
   ],
   bar: [
-    {name:"Lamine Yamal",pos:"ATT",age:19,ca:185,pa:195,mv:200},
-    {name:"Pedri",pos:"MID",age:23,ca:178,pa:185,mv:150},
-    {name:"Raphinha",pos:"ATT",age:29,ca:170,pa:172,mv:80},
-    {name:"Frenkie de Jong",pos:"MID",age:29,ca:165,pa:170,mv:50},
-    {name:"Jules Koundé",pos:"DEF",age:27,ca:162,pa:170,mv:65},
-    {name:"Gavi",pos:"MID",age:21,ca:158,pa:175,mv:60},
-    {name:"Dani Olmo",pos:"MID",age:28,ca:160,pa:165,mv:50},
-    {name:"Pau Cubarsí",pos:"DEF",age:19,ca:160,pa:185,mv:80},
-    {name:"Alejandro Balde",pos:"DEF",age:22,ca:155,pa:172,mv:60},
-    {name:"Fermín López",pos:"MID",age:23,ca:162,pa:175,mv:100},
+    {name:"Lamine Yamal",pos:"ED",age:19,ca:185,pa:195,mv:200},
+    {name:"Pedri",pos:"MC",age:23,ca:178,pa:185,mv:150},
+    {name:"Raphinha",pos:"EI",age:29,ca:170,pa:172,mv:80},
+    {name:"Frenkie de Jong",pos:"MC",age:29,ca:165,pa:170,mv:50},
+    {name:"Jules Koundé",pos:"LD",age:27,ca:162,pa:170,mv:65},
+    {name:"Gavi",pos:"MC",age:21,ca:158,pa:175,mv:60},
+    {name:"Dani Olmo",pos:"MP",age:28,ca:160,pa:165,mv:50},
+    {name:"Pau Cubarsí",pos:"DFC",age:19,ca:160,pa:185,mv:80},
+    {name:"Alejandro Balde",pos:"LI",age:22,ca:155,pa:172,mv:60},
+    {name:"Fermín López",pos:"MP",age:23,ca:162,pa:175,mv:100},
     {name:"Joan García",pos:"GK",age:25,ca:160,pa:175,mv:40},
-    {name:"Eric García",pos:"DEF",age:25,ca:150,pa:158,mv:25},
-    {name:"Marc Bernal",pos:"MID",age:19,ca:145,pa:175,mv:30}
+    {name:"Eric García",pos:"DFC",age:25,ca:150,pa:158,mv:25},
+    {name:"Marc Bernal",pos:"PIV",age:19,ca:145,pa:175,mv:30}
   ],
   atm: [
-    {name:"Julián Álvarez",pos:"ATT",age:26,ca:168,pa:178,mv:100},
-    {name:"Antoine Griezmann",pos:"ATT",age:35,ca:150,pa:152,mv:8},
-    {name:"Rodrigo De Paul",pos:"MID",age:32,ca:152,pa:155,mv:25},
-    {name:"José María Giménez",pos:"DEF",age:31,ca:155,pa:158,mv:30},
+    {name:"Julián Álvarez",pos:"DC",age:26,ca:168,pa:178,mv:100},
+    {name:"Antoine Griezmann",pos:"MP",age:35,ca:150,pa:152,mv:8},
+    {name:"Rodrigo De Paul",pos:"MC",age:32,ca:152,pa:155,mv:25},
+    {name:"José María Giménez",pos:"DFC",age:31,ca:155,pa:158,mv:30},
     {name:"Jan Oblak",pos:"GK",age:33,ca:165,pa:168,mv:25},
-    {name:"Koke",pos:"MID",age:34,ca:145,pa:146,mv:5},
-    {name:"Pablo Barrios",pos:"MID",age:23,ca:155,pa:172,mv:55},
-    {name:"Marcos Llorente",pos:"MID",age:31,ca:150,pa:152,mv:25}
+    {name:"Koke",pos:"MC",age:34,ca:145,pa:146,mv:5},
+    {name:"Pablo Barrios",pos:"MC",age:23,ca:155,pa:172,mv:55},
+    {name:"Marcos Llorente",pos:"MD",age:31,ca:150,pa:152,mv:25}
   ],
   ath: [
-    {name:"Nico Williams",pos:"ATT",age:23,ca:165,pa:178,mv:70},
-    {name:"Oihan Sancet",pos:"MID",age:26,ca:158,pa:168,mv:60},
-    {name:"Iñaki Williams",pos:"ATT",age:32,ca:148,pa:150,mv:15},
+    {name:"Nico Williams",pos:"EI",age:23,ca:165,pa:178,mv:70},
+    {name:"Oihan Sancet",pos:"MP",age:26,ca:158,pa:168,mv:60},
+    {name:"Iñaki Williams",pos:"DC",age:32,ca:148,pa:150,mv:15},
     {name:"Unai Simón",pos:"GK",age:29,ca:160,pa:165,mv:30},
-    {name:"Dani Vivian",pos:"DEF",age:27,ca:152,pa:162,mv:35}
+    {name:"Dani Vivian",pos:"DFC",age:27,ca:152,pa:162,mv:35}
   ],
   vil: [
-    {name:"Álex Baena",pos:"MID",age:25,ca:160,pa:172,mv:55},
-    {name:"Gerard Moreno",pos:"ATT",age:34,ca:148,pa:150,mv:8},
-    {name:"Yeremy Pino",pos:"ATT",age:23,ca:155,pa:172,mv:40}
+    {name:"Álex Baena",pos:"MP",age:25,ca:160,pa:172,mv:55},
+    {name:"Gerard Moreno",pos:"DC",age:34,ca:148,pa:150,mv:8},
+    {name:"Yeremy Pino",pos:"ED",age:23,ca:155,pa:172,mv:40}
   ],
   rso: [
-    {name:"Martín Zubimendi",pos:"MID",age:27,ca:160,pa:168,mv:60},
-    {name:"Mikel Oyarzabal",pos:"ATT",age:29,ca:155,pa:158,mv:40},
-    {name:"Takefusa Kubo",pos:"ATT",age:25,ca:158,pa:170,mv:45}
+    {name:"Martín Zubimendi",pos:"PIV",age:27,ca:160,pa:168,mv:60},
+    {name:"Mikel Oyarzabal",pos:"DC",age:29,ca:155,pa:158,mv:40},
+    {name:"Takefusa Kubo",pos:"ED",age:25,ca:158,pa:170,mv:45}
   ]
 };
 
 const FIRST_NAMES = ["Luka","Alejandro","Ferran","Rodri","Bruno","Phil","Martin","Federico","Rafael","João","Bernardo","Toni","Joshua","Jamal","Kai","Cole","Declan","Virgil","Ruben","William","Marc","Antonio","Theo","Achraf","Jules","Frenkie","Mason","Marcus","Raheem","Jack","James","Pablo","Hugo","Iñaki","Unai","Mikel","Oihan","Nico","Yeremy","Álex","Fermín","Dean","Arda","Pau"];
 const LAST_NAMES = ["García","Rodríguez","Martínez","López","González","Pérez","Sánchez","Ramírez","Torres","Flores","Silva","Costa","Santos","Fernandes","Carvalho","Castillo","Vargas","Reyes","Cruz","Molina","Herrera","Jiménez","Ruiz","Alonso","Navarro","Romero","Castro","Ramos","Vega","Méndez","Guerrero","Núñez","Rojas","Medina","Aguilar","Huijsen","Güler","Cubarsí","Bernal"];
 
+// Formaciones con posiciones específicas
 const FORMATIONS = {
-  "4-2-3-1":[{x:50,y:88,pos:"GK"},{x:18,y:70,pos:"DEF"},{x:38,y:72,pos:"DEF"},{x:62,y:72,pos:"DEF"},{x:82,y:70,pos:"DEF"},{x:35,y:52,pos:"MID"},{x:65,y:52,pos:"MID"},{x:18,y:35,pos:"MID"},{x:50,y:32,pos:"MID"},{x:82,y:35,pos:"MID"},{x:50,y:14,pos:"ATT"}],
-  "4-3-3":[{x:50,y:88,pos:"GK"},{x:18,y:70,pos:"DEF"},{x:38,y:72,pos:"DEF"},{x:62,y:72,pos:"DEF"},{x:82,y:70,pos:"DEF"},{x:30,y:50,pos:"MID"},{x:50,y:48,pos:"MID"},{x:70,y:50,pos:"MID"},{x:20,y:22,pos:"ATT"},{x:50,y:16,pos:"ATT"},{x:80,y:22,pos:"ATT"}],
-  "4-4-2":[{x:50,y:88,pos:"GK"},{x:18,y:70,pos:"DEF"},{x:38,y:72,pos:"DEF"},{x:62,y:72,pos:"DEF"},{x:82,y:70,pos:"DEF"},{x:18,y:48,pos:"MID"},{x:38,y:50,pos:"MID"},{x:62,y:50,pos:"MID"},{x:82,y:48,pos:"MID"},{x:38,y:18,pos:"ATT"},{x:62,y:18,pos:"ATT"}],
-  "3-5-2":[{x:50,y:88,pos:"GK"},{x:30,y:72,pos:"DEF"},{x:50,y:74,pos:"DEF"},{x:70,y:72,pos:"DEF"},{x:12,y:48,pos:"MID"},{x:32,y:50,pos:"MID"},{x:50,y:46,pos:"MID"},{x:68,y:50,pos:"MID"},{x:88,y:48,pos:"MID"},{x:38,y:18,pos:"ATT"},{x:62,y:18,pos:"ATT"}],
-  "4-1-4-1":[{x:50,y:88,pos:"GK"},{x:18,y:70,pos:"DEF"},{x:38,y:72,pos:"DEF"},{x:62,y:72,pos:"DEF"},{x:82,y:70,pos:"DEF"},{x:50,y:58,pos:"MID"},{x:18,y:40,pos:"MID"},{x:38,y:38,pos:"MID"},{x:62,y:38,pos:"MID"},{x:82,y:40,pos:"MID"},{x:50,y:14,pos:"ATT"}],
-  "5-3-2":[{x:50,y:88,pos:"GK"},{x:12,y:68,pos:"DEF"},{x:30,y:72,pos:"DEF"},{x:50,y:74,pos:"DEF"},{x:70,y:72,pos:"DEF"},{x:88,y:68,pos:"DEF"},{x:30,y:46,pos:"MID"},{x:50,y:44,pos:"MID"},{x:70,y:46,pos:"MID"},{x:38,y:18,pos:"ATT"},{x:62,y:18,pos:"ATT"}]
+  "4-2-3-1":[
+    {x:50,y:88,pos:"GK"},
+    {x:18,y:70,pos:"LI"},{x:38,y:72,pos:"DFC"},{x:62,y:72,pos:"DFC"},{x:82,y:70,pos:"LD"},
+    {x:35,y:52,pos:"PIV"},{x:65,y:52,pos:"PIV"},
+    {x:18,y:35,pos:"EI"},{x:50,y:32,pos:"MP"},{x:82,y:35,pos:"ED"},
+    {x:50,y:14,pos:"DC"}
+  ],
+  "4-3-3":[
+    {x:50,y:88,pos:"GK"},
+    {x:18,y:70,pos:"LI"},{x:38,y:72,pos:"DFC"},{x:62,y:72,pos:"DFC"},{x:82,y:70,pos:"LD"},
+    {x:30,y:50,pos:"MC"},{x:50,y:48,pos:"PIV"},{x:70,y:50,pos:"MC"},
+    {x:20,y:22,pos:"EI"},{x:50,y:16,pos:"DC"},{x:80,y:22,pos:"ED"}
+  ],
+  "4-4-2":[
+    {x:50,y:88,pos:"GK"},
+    {x:18,y:70,pos:"LI"},{x:38,y:72,pos:"DFC"},{x:62,y:72,pos:"DFC"},{x:82,y:70,pos:"LD"},
+    {x:18,y:48,pos:"MI"},{x:38,y:50,pos:"MC"},{x:62,y:50,pos:"MC"},{x:82,y:48,pos:"MD"},
+    {x:38,y:18,pos:"DC"},{x:62,y:18,pos:"DC"}
+  ],
+  "3-5-2":[
+    {x:50,y:88,pos:"GK"},
+    {x:30,y:72,pos:"DFC"},{x:50,y:74,pos:"DFC"},{x:70,y:72,pos:"DFC"},
+    {x:12,y:48,pos:"CI"},{x:32,y:50,pos:"MC"},{x:50,y:46,pos:"PIV"},{x:68,y:50,pos:"MC"},{x:88,y:48,pos:"CD"},
+    {x:38,y:18,pos:"DC"},{x:62,y:18,pos:"DC"}
+  ],
+  "4-1-4-1":[
+    {x:50,y:88,pos:"GK"},
+    {x:18,y:70,pos:"LI"},{x:38,y:72,pos:"DFC"},{x:62,y:72,pos:"DFC"},{x:82,y:70,pos:"LD"},
+    {x:50,y:58,pos:"PIV"},
+    {x:18,y:40,pos:"MI"},{x:38,y:38,pos:"MC"},{x:62,y:38,pos:"MC"},{x:82,y:40,pos:"MD"},
+    {x:50,y:14,pos:"DC"}
+  ],
+  "5-3-2":[
+    {x:50,y:88,pos:"GK"},
+    {x:12,y:68,pos:"CI"},{x:30,y:72,pos:"DFC"},{x:50,y:74,pos:"DFC"},{x:70,y:72,pos:"DFC"},{x:88,y:68,pos:"CD"},
+    {x:30,y:46,pos:"MC"},{x:50,y:44,pos:"PIV"},{x:70,y:46,pos:"MC"},
+    {x:38,y:18,pos:"DC"},{x:62,y:18,pos:"DC"}
+  ]
 };
 
 const COPA_ROUNDS = ["Dieciseisavos","Octavos","Cuartos","Semifinales","Final"];
-const POS_ORDER = {GK:1, DEF:2, MID:3, ATT:4};
+
+// Orden de posiciones para ordenar la plantilla
+const POS_ORDER = {
+  GK:1,
+  LI:2, DFC:3, LD:4,
+  CI:5, PIV:6, CD:7,
+  MI:8, MC:9, MD:10,
+  EI:11, MP:12, ED:13,
+  DI:14, DC:15, DD:16
+};
+
+// Grupos para el filtro
+const POS_GROUPS = {
+  DEF: ["LI","DFC","LD"],
+  WB: ["CI","CD"],
+  MID: ["PIV","MI","MC","MD"],
+  ATT: ["EI","MP","ED","DI","DC","DD"]
+};
 
 let state = {
   userClubId: null,
@@ -548,11 +611,27 @@ function generateSquad(clubId, strength){
     p.value = Math.round(Math.pow(p.ca/50,3.2)*(38-p.age)*1.3);
     squad.push(p);
   });
-  const needed = {GK:2, DEF:8, MID:8, ATT:6};
-  stars.forEach(s => needed[s.pos] = Math.max(0, (needed[s.pos]||0)-1));
-  Object.entries(needed).forEach(([pos,n]) => {
-    for(let i=0; i<n; i++) squad.push(generatePlayer(pos, strength - rand(0,15)));
+
+  // Necesidades más realistas por posición
+  const needed = {
+    GK: 2,
+    LI: 2, DFC: 4, LD: 2,
+    CI: 1, CD: 1,
+    PIV: 2, MI: 1, MC: 3, MD: 1,
+    EI: 2, MP: 2, ED: 2,
+    DI: 1, DC: 2, DD: 1
+  };
+
+  stars.forEach(s => {
+    if(needed[s.pos] !== undefined) needed[s.pos] = Math.max(0, needed[s.pos]-1);
   });
+
+  Object.entries(needed).forEach(([pos, n]) => {
+    for(let i=0; i<n; i++){
+      squad.push(generatePlayer(pos, strength - rand(0,15)));
+    }
+  });
+
   return squad.sort((a,b) => b.ca - a.ca);
 }
 
@@ -582,7 +661,7 @@ function generateFixtures(){
 
 function generateTransferList(){
   const list = [];
-  const positions = ["GK","DEF","MID","ATT"];
+  const positions = ["GK","LI","DFC","LD","CI","PIV","CD","MI","MC","MD","EI","MP","ED","DI","DC","DD"];
   const clubs = ["Ajax","Benfica","Porto","Dortmund","Leverkusen","Napoli","Milan","Lazio","Brighton","Atalanta","Lille","Monaco","Sporting","Feyenoord","RB Leipzig","PSV","Braga","Frankfurt","Wolfsburg","Nice"];
   for(let i=0; i<30; i++){
     const pos = pick(positions);
@@ -622,7 +701,16 @@ function autoSelectLineup(){
   const available = state.players.filter(p => !p.injured).sort((a,b) => b.ca - a.ca);
   const used = new Set();
   state.lineup = slots.map(slot => {
+    // 1º intentar posición exacta
     let p = available.find(pl => pl.pos === slot.pos && !used.has(pl.id));
+    // 2º intentar grupo similar
+    if(!p){
+      const group = Object.entries(POS_GROUPS).find(([k,v]) => v.includes(slot.pos));
+      if(group){
+        p = available.find(pl => group[1].includes(pl.pos) && !used.has(pl.id));
+      }
+    }
+    // 3º cualquier jugador
     if(!p) p = available.find(pl => !used.has(pl.id));
     if(p){ used.add(p.id); return p.id; }
     return null;
@@ -694,6 +782,10 @@ function simulateMatch(homeId, awayId){
   const homePlayers = getMatchPlayers(homeId);
   const awayPlayers = getMatchPlayers(awayId);
 
+  // Prioridad de goleadores: delanteros > extremos/mediapuntas > mediocentros
+  const attackPos = ["DC","DI","DD","EI","ED","MP"];
+  const midPos = ["MC","MI","MD","PIV"];
+
   const minutes = [];
   for(let j=0; j<hg+ag; j++) minutes.push(rand(3,92));
   minutes.sort((a,b) => a-b);
@@ -701,13 +793,17 @@ function simulateMatch(homeId, awayId){
   let hs = 0, as_ = 0;
   minutes.forEach(min => {
     if(hs < hg && (as_ >= ag || Math.random() < 0.55)){
-      const pool = homePlayers.filter(p => p.pos === "ATT" || p.pos === "MID");
-      const scorer = pool.length ? pick(pool) : (homePlayers.length ? pick(homePlayers) : {name:"Jugador"});
+      let pool = homePlayers.filter(p => attackPos.includes(p.pos));
+      if(!pool.length) pool = homePlayers.filter(p => midPos.includes(p.pos));
+      if(!pool.length) pool = homePlayers;
+      const scorer = pool.length ? pick(pool) : {name:"Jugador"};
       events.push({min, type:"goal", text:`⚽ GOL! ${scorer.name} (${homeName})`});
       hs++;
     } else if(as_ < ag){
-      const pool2 = awayPlayers.filter(p => p.pos === "ATT" || p.pos === "MID");
-      const scorer2 = pool2.length ? pick(pool2) : (awayPlayers.length ? pick(awayPlayers) : {name:"Jugador"});
+      let pool2 = awayPlayers.filter(p => attackPos.includes(p.pos));
+      if(!pool2.length) pool2 = awayPlayers.filter(p => midPos.includes(p.pos));
+      if(!pool2.length) pool2 = awayPlayers;
+      const scorer2 = pool2.length ? pick(pool2) : {name:"Jugador"};
       events.push({min, type:"goal", text:`⚽ GOL! ${scorer2.name} (${awayName})`});
       as_++;
     }
@@ -844,7 +940,11 @@ function updateSortHeaders(){
 
 function renderSquad(){
   const filter = document.getElementById("squad-filter").value;
-  let list = filter === "all" ? state.players : state.players.filter(p => p.pos === filter);
+  let list;
+  if(filter === "all") list = state.players;
+  else if(POS_GROUPS[filter]) list = state.players.filter(p => POS_GROUPS[filter].includes(p.pos));
+  else list = state.players.filter(p => p.pos === filter);
+
   list = sortSquadList(list);
   updateSortHeaders();
   document.getElementById("squad-table").innerHTML = list.map(p => `
@@ -874,7 +974,7 @@ function renderPitch(){
     const player = pid ? state.players.find(p => p.id === pid) : null;
     const selected = state.selectedSlot === idx ? "selected" : "";
     const empty = !player ? "empty" : "";
-    return `<div class="player-token ${selected} ${empty}" style="left:${slot.x}%;top:${slot.y}%" data-slot="${idx}" title="${player ? player.name : 'Vacío - clic para elegir'}">
+    return `<div class="player-token ${selected} ${empty}" style="left:${slot.x}%;top:${slot.y}%" data-slot="${idx}" title="${player ? player.name + ' ('+player.pos+')' : 'Vacío - clic para elegir'}">
       <span class="num">${player ? player.ca : '–'}</span>
       <span class="name">${player ? player.name.split(" ").pop() : slot.pos}</span>
     </div>`;
@@ -899,16 +999,24 @@ function renderLineupPlayers(){
     return;
   }
   const slots = FORMATIONS[state.formation] || FORMATIONS["4-2-3-1"];
-  const preferredPos = slots[state.selectedSlot]?.pos || "MID";
+  const preferredPos = slots[state.selectedSlot]?.pos || "MC";
   hint.innerHTML = `Elige jugador para la posición <strong>${preferredPos}</strong>`;
 
   const inXi = new Set(state.lineup.filter(Boolean));
   const available = state.players
     .filter(p => !p.injured)
     .sort((a,b) => {
-      const aPref = a.pos === preferredPos ? 0 : 1;
-      const bPref = b.pos === preferredPos ? 0 : 1;
-      if(aPref !== bPref) return aPref - bPref;
+      // Prioridad: posición exacta > mismo grupo > resto
+      const aExact = a.pos === preferredPos ? 0 : 1;
+      const bExact = b.pos === preferredPos ? 0 : 1;
+      if(aExact !== bExact) return aExact - bExact;
+
+      const group = Object.entries(POS_GROUPS).find(([k,v]) => v.includes(preferredPos));
+      if(group){
+        const aGroup = group[1].includes(a.pos) ? 0 : 1;
+        const bGroup = group[1].includes(b.pos) ? 0 : 1;
+        if(aGroup !== bGroup) return aGroup - bGroup;
+      }
       return b.ca - a.ca;
     });
 
